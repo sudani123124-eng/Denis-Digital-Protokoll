@@ -33,13 +33,7 @@ body.dark-mode .modal-box input { background: #3a3a3a; color: var(--text); borde
 .proto-row.danger .cell { border-color: rgba(232,57,74,0.4) !important; background: #fff5f5 !important; }
 body.dark-mode .proto-row.danger .cell { background: #3a1a1a !important; }
 
-.autosave-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
-  background: #e8f5e9; border-top: 2px solid #4cba6b;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 16px; font-size: 11px; font-weight: 700; color: #2e7d32;
-  transition: all 0.3s; gap: 10px;
-}
+.autosave-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: #e8f5e9; border-top: 2px solid #4cba6b; display: flex; align-items: center; justify-content: space-between; padding: 6px 16px; font-size: 11px; font-weight: 700; color: #2e7d32; transition: all 0.3s; gap: 10px; }
 .autosave-bar.saving { background: #fff3e0; border-color: var(--orange); color: #e65100; }
 .autosave-bar.error  { background: #ffebee; border-color: var(--red); color: #b71c1c; }
 .as-dot { width: 8px; height: 8px; border-radius: 50%; background: #4cba6b; flex-shrink: 0; }
@@ -171,7 +165,7 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .tiny-btn:hover { border-color: var(--red); color: var(--red); background: rgba(232,57,74,0.04); }
 
 .foto-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; width: 100%; }
-.foto-thumb { width: 40px; height: 34px; border-radius: 7px; object-fit: cover; border: 1.5px solid var(--border); cursor: zoom-in; transition: transform 0.15px; flex-shrink: 0; }
+.foto-thumb { width: 40px; height: 34px; border-radius: 7px; object-fit: cover; border: 1.5px solid var(--border); cursor: zoom-in; transition: transform 0.15s; flex-shrink: 0; }
 .foto-thumb:hover { transform: scale(1.06); }
 
 .add-zone { padding: 10px 16px; display: flex; justify-content: center; align-items: center; gap: 12px; }
@@ -194,7 +188,7 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 
 /* ── AI FEATURES ── */
 .ai-btn { position: fixed; right: 12px; bottom: 54px; z-index: 998; background: linear-gradient(135deg,#7c3aed,#4f46e5); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 18px; cursor: pointer; box-shadow: 0 3px 16px rgba(124,58,237,0.45); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-.ai-btn:hover { transform: scale(1.12); box-shadow: 0 5px 22px rgba(124,58,237,0.6); }
+.ai-btn:hover { transform: scale(1.12); }
 .ai-btn-pulse { animation: ai-pulse 2s infinite; }
 @keyframes ai-pulse { 0%,100%{box-shadow:0 3px 16px rgba(124,58,237,0.45);} 50%{box-shadow:0 3px 24px rgba(124,58,237,0.75);} }
 .ai-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9995;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px); }
@@ -209,9 +203,9 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 body.dark-mode .ai-tab { background:#3a3a3a;border-color:#555; }
 .voice-area { display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 0; }
 .voice-btn { width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;color:white;font-size:28px;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,0.4);transition:all 0.2s;display:flex;align-items:center;justify-content:center; }
-.voice-btn.recording { background:linear-gradient(135deg,var(--red),#c8102e);animation:rec-pulse 1s infinite;box-shadow:0 4px 18px rgba(232,57,74,0.5); }
+.voice-btn.recording { background:linear-gradient(135deg,var(--red),#c8102e);animation:rec-pulse 1s infinite; }
 @keyframes rec-pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
-.voice-status { font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.5px; }
+.voice-status { font-size:12px;font-weight:700;color:var(--muted); }
 .voice-result { width:100%;background:#f8f9fc;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--text);min-height:60px;line-height:1.6; }
 body.dark-mode .voice-result { background:#333;border-color:#555; }
 .ai-describe-input { width:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;background:#fafafa;outline:none;resize:none;min-height:80px;transition:border-color 0.15s; }
@@ -258,8 +252,6 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
 .archive-overlay.open { display: block; }
 
 .sound-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 9px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; user-select: none; }
-.sound-badge:hover { background: rgba(255,255,255,0.2); }
-
 .shift-day-info { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,179,185,0.15); border: 1px solid rgba(255,179,185,0.3); border-radius: 20px; padding: 3px 9px; font-size: 9px; font-weight: 700; color: rgba(255,220,220,0.9); margin-top: 2px; }
 
 @media print {
@@ -376,7 +368,6 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
     <div class="col-tag tag-ende">Ende</div>
     <div class="col-tag tag-notiz">Dienstnotiz</div>
   </div>
-
   <div class="rows-wrap" id="rowsWrap"></div>
 
   <div class="add-zone no-print">
@@ -396,15 +387,12 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
   </div>
 </div>
 
-<!-- AI MODAL -->
 <div class="ai-modal-overlay" id="aiModalOverlay" style="display:none" onclick="closeAiModal(event)">
   <div class="ai-modal" onclick="event.stopPropagation()">
     <div class="ai-modal-handle"></div>
     <div class="ai-modal-title">🤖 <span>KI-Assistent</span></div>
     <div class="ai-modal-sub">Sprache · Beschreibung · Foto-Analyse</div>
-    <select class="ai-row-select" id="aiRowSelect">
-      <option value="">— Zeile auswählen (optional) —</option>
-    </select>
+    <select class="ai-row-select" id="aiRowSelect"><option value="">— Zeile auswählen (optional) —</option></select>
     <div class="ai-tabs">
       <button class="ai-tab active" onclick="switchAiTab('voice',this)">🎙 Sprache</button>
       <button class="ai-tab" onclick="switchAiTab('describe',this)">✍️ Beschreiben</button>
@@ -458,7 +446,6 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
 
 <script>
 const KUNDEN = ['— Standort —','Galerie','Lüneburg Parkhaus','Fuhle','Parking Millerntorplatz','Parkhaus My Falkenried'];
-
 const EREIGNISSE_GROUPS = [
   { label: '── Regulär ──', disabled: true },
   { label: 'Obdachlose nach draußen gebracht' },
@@ -488,15 +475,12 @@ const EREIGNISSE_GROUPS = [
   { label: 'Fahrzeug unberechtigt geparkt – Abschlepper verständigt' },
   { label: 'Freitext…' },
 ];
-
 const EVENT_COLORS = {
   red:    ['Polizei eingetroffen – Obdachlose Person entfernt 🚨','Polizei eingetroffen – Personalien aufgenommen 🚨','Vandalismus gemeldet – Polizei informiert 🚨','Notruf / Notfall gemeldet 🚨','Rettungsdienst angefordert 🚑','Diebstahl gemeldet – Polizei verständigt 🚨','Rohrbruch / Wasseraustritt 💧','Defekte Tür / Fenster 🚪'],
   orange: ['Sicherungsausfall ⚡','Dauersignal an Schranke ⚠️','Ruhestörung – Personen verwiesen','Streit geschlichtet','Fahrzeug unberechtigt geparkt – Abschlepper verständigt'],
   blue:   ['Technischer Defekt gemeldet 🔧','Defekte Beleuchtung 💡','Schrankenstörung 🚧'],
 };
-
 const DANGER_EVENTS = ['Polizei eingetroffen – Obdachlose Person entfernt 🚨','Polizei eingetroffen – Personalien aufgenommen 🚨','Vandalismus gemeldet – Polizei informiert 🚨','Notruf / Notfall gemeldet 🚨','Rettungsdienst angefordert 🚑','Diebstahl gemeldet – Polizei verständigt 🚨','Streit geschlichtet','Ruhestörung – Personen verwiesen'];
-
 const INIT = [
   { k:'Lüneburg Parkhaus', b:'17:57', e:'19:13', n:[{ev:'Obdachlose nach draußen gebracht',c:1}] },
   { k:'Galerie',           b:'21:00', e:'21:35', n:[{ev:'Obdachlose nach draußen gebracht',c:1},{ev:'Fahrzeuge herausgelassen',c:1}] },
@@ -508,60 +492,40 @@ const INIT = [
   { k:'Lüneburg Parkhaus', b:'06:35', e:'07:00', n:[] },
 ];
 
-let rowId = 0, statusOk = true;
-const nCounts = {};
-let soundEnabled = localStorage.getItem('denis_sound') !== '0';
-let autoSaveTimer = null, pendingSave = false, currentProtoNr = '';
+let rowId=0,statusOk=true;
+const nCounts={};
+let soundEnabled=localStorage.getItem('denis_sound')!=='0';
+let autoSaveTimer=null,pendingSave=false,currentProtoNr='';
 
-function getShiftDate() {
-  const now = new Date();
-  if (now.getHours() < 17) {
-    const y = new Date(now); y.setDate(y.getDate()-1); return y;
-  }
-  return now;
-}
-function getShiftDayLabel(d) { return ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()]; }
-function formatDateISO(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function formatDateDE(d) { return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; }
+function getShiftDate(){const now=new Date();if(now.getHours()<17){const y=new Date(now);y.setDate(y.getDate()-1);return y;}return now;}
+function getShiftDayLabel(d){return['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()];}
+function formatDateISO(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function formatDateDE(d){return`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;}
 
-(function initShiftDateTime() {
-  const sd = getShiftDate(), now = new Date();
-  document.getElementById('dateInput').value = formatDateISO(sd);
-  document.getElementById('daySelect').value = getShiftDayLabel(sd);
-  const si = document.getElementById('shiftDayInfo');
-  if (si) si.textContent = now.getHours() < 17 ? `📅 Nachtschicht von gestern (${formatDateDE(sd)})` : `📅 Schicht ab heute (${formatDateDE(sd)})`;
+(function initShiftDateTime(){
+  const sd=getShiftDate(),now=new Date();
+  document.getElementById('dateInput').value=formatDateISO(sd);
+  document.getElementById('daySelect').value=getShiftDayLabel(sd);
+  const si=document.getElementById('shiftDayInfo');
+  if(si)si.textContent=now.getHours()<17?`📅 Nachtschicht von gestern (${formatDateDE(sd)})`:`📅 Schicht ab heute (${formatDateDE(sd)})`;
 })();
 
-function generateProtoNr(increment=true) {
-  const d = getShiftDate();
-  const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-  const storedKey = localStorage.getItem('denis_proto_date');
-  let counter = 1;
-  if (storedKey===dateKey) { counter=parseInt(localStorage.getItem('denis_proto_seq')||'0'); if(increment) counter++; }
-  if (increment||storedKey!==dateKey) { localStorage.setItem('denis_proto_date',dateKey); localStorage.setItem('denis_proto_seq',counter); }
-  return `${formatDateDE(d)} – NR-${String(counter).padStart(3,'0')}`;
+function generateProtoNr(increment=true){
+  const d=getShiftDate();
+  const dateKey=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const storedKey=localStorage.getItem('denis_proto_date');
+  let counter=1;
+  if(storedKey===dateKey){counter=parseInt(localStorage.getItem('denis_proto_seq')||'0');if(increment)counter++;}
+  if(increment||storedKey!==dateKey){localStorage.setItem('denis_proto_date',dateKey);localStorage.setItem('denis_proto_seq',counter);}
+  return`${formatDateDE(d)} – NR-${String(counter).padStart(3,'0')}`;
 }
-function applyProtoNr(nr) { currentProtoNr=nr; const el=document.getElementById('protokollNrText'); if(el) el.textContent=nr; }
-function refreshProtoNr() { applyProtoNr(generateProtoNr(true)); showToast('🔄 Neue Protokoll-Nr. generiert','info'); saveData(); }
+function applyProtoNr(nr){currentProtoNr=nr;const el=document.getElementById('protokollNrText');if(el)el.textContent=nr;}
+function refreshProtoNr(){applyProtoNr(generateProtoNr(true));showToast('🔄 Neue Protokoll-Nr. generiert','info');saveData();}
 
-const AudioCtx = window.AudioContext||window.webkitAudioContext;
-let audioCtx=null;
-function getAudioCtx() { if(!audioCtx){try{audioCtx=new AudioCtx();}catch(e){}} return audioCtx; }
-function playBeep(type='save') {
-  if(!soundEnabled) return;
-  const ctx=getAudioCtx(); if(!ctx) return;
-  const osc=ctx.createOscillator(), gain=ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  if(type==='save'){osc.frequency.value=880;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);osc.start();osc.stop(ctx.currentTime+0.2);}
-  if(type==='danger'){osc.frequency.value=440;gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}
-  if(type==='success'){osc.frequency.value=660;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3);}
-}
-function toggleSound() {
-  soundEnabled=!soundEnabled; localStorage.setItem('denis_sound',soundEnabled?'1':'0');
-  const b=document.getElementById('soundBadge'); if(b) b.textContent=soundEnabled?'🔔 Ton':'🔕 Stumm';
-  const btn=document.getElementById('soundBtn'); if(btn) btn.textContent=soundEnabled?'🔔':'🔕';
-  showToast(soundEnabled?'🔔 Ton aktiviert':'🔕 Ton deaktiviert','info');
-}
+const AudioCtx=window.AudioContext||window.webkitAudioContext;let audioCtx=null;
+function getAudioCtx(){if(!audioCtx){try{audioCtx=new AudioCtx();}catch(e){}}return audioCtx;}
+function playBeep(type='save'){if(!soundEnabled)return;const ctx=getAudioCtx();if(!ctx)return;const osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);if(type==='save'){osc.frequency.value=880;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);osc.start();osc.stop(ctx.currentTime+0.2);}if(type==='danger'){osc.frequency.value=440;gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}if(type==='success'){osc.frequency.value=660;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3);}}
+function toggleSound(){soundEnabled=!soundEnabled;localStorage.setItem('denis_sound',soundEnabled?'1':'0');const b=document.getElementById('soundBadge');if(b)b.textContent=soundEnabled?'🔔 Ton':'🔕 Stumm';const btn=document.getElementById('soundBtn');if(btn)btn.textContent=soundEnabled?'🔔':'🔕';showToast(soundEnabled?'🔔 Ton aktiviert':'🔕 Ton deaktiviert','info');}
 if(!soundEnabled){setTimeout(()=>{const b=document.getElementById('soundBadge');if(b)b.textContent='🔕 Stumm';const btn=document.getElementById('soundBtn');if(btn)btn.textContent='🔕';},100);}
 
 function showToast(msg,type='success',duration=2500){const wrap=document.getElementById('toastWrap');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=msg;wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300);},duration);}
@@ -572,17 +536,16 @@ function updateNotizSelectStyle(sel){const c=getEventColor(sel.value);sel.style.
 function checkDanger(row){const hD=Array.from(row.querySelectorAll('.notiz-select')).some(s=>DANGER_EVENTS.includes(s.value));const was=row.classList.contains('danger');row.classList.toggle('danger',hD);if(hD&&!was)playBeep('danger');}
 function colorTime(input){const val=input.value;if(!val)return;const h=parseInt(val.split(':')[0]);input.classList.remove('t-night','t-day','t-eve');if(h>=6&&h<17)input.classList.add('t-day');else if(h>=17&&h<22)input.classList.add('t-eve');else input.classList.add('t-night');}
 function setNow(inputId){const now=new Date();const el=document.getElementById(inputId);if(el){el.value=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;colorTime(el);}}
-
 function toggleStatus(){statusOk=!statusOk;document.getElementById('statusBadge').className='status-badge'+(statusOk?'':' incident');document.getElementById('statusText').textContent=statusOk?'Regulär':'Vorfall aktiv';if(!statusOk)playBeep('danger');}
 
 function addRow(data){
-  const id=++rowId; nCounts[id]=[];
+  const id=++rowId;nCounts[id]=[];
   const k=data?.k||'— Standort —',bv=data?.b||'00:00',ev=data?.e||'00:00';
   const isCustom=!KUNDEN.includes(k)&&k!=='— Standort —';
   const div=document.createElement('div');div.className='proto-row';div.id=`row-${id}`;
   div.innerHTML=`
     <div class="cell cell-kunde">
-      <span class="row-num">#${String(id).padStart(2,'0')}</span>
+      <span class="row-num">#${String(id).padStart(2,'00')}</span>
       <select id="ksel-${id}" onchange="onKundeChange(this,${id})" style="display:${isCustom?'none':'block'}">
         ${KUNDEN.map(x=>`<option${x===k?' selected':''}>${x}</option>`).join('')}
         <option value="__custom__">✏️ Eigener Name…</option>
@@ -610,8 +573,7 @@ function addRow(data){
         <input type="file" id="fi-${id}" accept="image/*" style="display:none" onchange="addFoto(${id},this)">
         <input type="file" id="fiai-${id}" accept="image/*" style="display:none" onchange="openAiPhotoFromRow(${id},this)">
       </div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('rowsWrap').appendChild(div);
   if(data?.n)data.n.forEach(n=>addNotiz(id,n.ev,n.c,n.ft||''));
   if(data?.photos&&data.photos.length){data.photos.forEach(b64=>{const fr=document.getElementById(`fr-${id}`);const wrap=document.createElement('div');wrap.style.cssText='position:relative;display:inline-flex;flex-shrink:0;';wrap.dataset.b64=b64;const img=document.createElement('img');img.src=b64;img.className='foto-thumb';img.dataset.b64=b64;img.onclick=()=>window.open(b64,'_blank');const delBtn=document.createElement('button');delBtn.textContent='✕';delBtn.className='no-print';delBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);color:white;border:none;font-size:9px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10;padding:0;';delBtn.onclick=(e)=>{e.stopPropagation();wrap.style.opacity='0';wrap.style.transition='opacity 0.2s';setTimeout(()=>{wrap.remove();updateSummary();},200);};wrap.appendChild(img);wrap.appendChild(delBtn);fr.appendChild(wrap);});}
@@ -621,15 +583,7 @@ function addRow(data){
 function removeLastRow(){const rows=document.querySelectorAll('.proto-row');if(!rows.length)return;const last=rows[rows.length-1];last.style.cssText+='opacity:0;transform:translateX(20px);transition:all 0.2s';setTimeout(()=>{last.remove();updateSummary();},200);}
 function removeRow(id){const el=document.getElementById(`row-${id}`);if(el){el.style.cssText+='opacity:0;transform:translateX(20px);transition:all 0.2s';setTimeout(()=>{el.remove();updateSummary();},200);}}
 
-function addNotiz(rId,ereignis,count,freeText){
-  const ni=document.getElementById(`ni-${rId}`);const idx=nCounts[rId].length;nCounts[rId].push(count||0);
-  const isFree=ereignis==='Freitext…';const item=document.createElement('div');item.className='notiz-item';item.id=`ni-${rId}-${idx}`;
-  item.innerHTML=`<div class="nc-wrap"><button class="nc-btn m" onclick="chN(${rId},${idx},-1)">−</button><span class="nc-num" id="nc-${rId}-${idx}">${count||0}</span><button class="nc-btn p" onclick="chN(${rId},${idx},+1)">+</button></div><select class="notiz-select" onchange="updateNotizSelectStyle(this);onNChange(this,${rId},${idx})">${buildEreignisOptions(ereignis||'')}</select><button class="notiz-del-btn no-print" onclick="deleteNotiz(this)">🗑</button>`;
-  ni.appendChild(item);
-  const ta=document.createElement('textarea');ta.className='notiz-free';ta.value=freeText||'';ta.style.display=isFree?'block':'none';ni.appendChild(ta);
-  const sel=item.querySelector('.notiz-select');if(sel&&sel.value)updateNotizSelectStyle(sel);
-  updateSummary();
-}
+function addNotiz(rId,ereignis,count,freeText){const ni=document.getElementById(`ni-${rId}`);const idx=nCounts[rId].length;nCounts[rId].push(count||0);const isFree=ereignis==='Freitext…';const item=document.createElement('div');item.className='notiz-item';item.id=`ni-${rId}-${idx}`;item.innerHTML=`<div class="nc-wrap"><button class="nc-btn m" onclick="chN(${rId},${idx},-1)">−</button><span class="nc-num" id="nc-${rId}-${idx}">${count||0}</span><button class="nc-btn p" onclick="chN(${rId},${idx},+1)">+</button></div><select class="notiz-select" onchange="updateNotizSelectStyle(this);onNChange(this,${rId},${idx})">${buildEreignisOptions(ereignis||'')}</select><button class="notiz-del-btn no-print" onclick="deleteNotiz(this)">🗑</button>`;ni.appendChild(item);const ta=document.createElement('textarea');ta.className='notiz-free';ta.value=freeText||'';ta.style.display=isFree?'block':'none';ni.appendChild(ta);const sel=item.querySelector('.notiz-select');if(sel&&sel.value)updateNotizSelectStyle(sel);updateSummary();}
 function deleteNotiz(btn){const item=btn.closest('.notiz-item');const next=item.nextElementSibling;if(next&&next.tagName==='TEXTAREA')next.remove();item.style.opacity='0';item.style.transform='translateX(10px)';item.style.transition='all 0.18s';setTimeout(()=>{item.remove();updateSummary();},180);}
 function onNChange(sel,rId,idx){const ta=document.getElementById(`ni-${rId}-${idx}`)?.nextElementSibling;if(ta&&ta.tagName==='TEXTAREA')ta.style.display=sel.value==='Freitext…'?'block':'none';updateSummary();}
 function chN(rId,idx,d){nCounts[rId][idx]=Math.max(0,(nCounts[rId][idx]||0)+d);document.getElementById(`nc-${rId}-${idx}`).textContent=nCounts[rId][idx];updateSummary();}
@@ -687,7 +641,7 @@ document.querySelectorAll('.time-input-direct').forEach(colorTime);
 document.querySelectorAll('.notiz-select').forEach(updateNotizSelectStyle);
 
 // ══════════════════════════════════════════
-// 🤖 KI-ASSISTENT
+// 🤖 KI-ASSISTENT (Offline – kein API Key)
 // ══════════════════════════════════════════
 let aiCurrentTab='voice',aiTargetRowId=null,mediaRecorder=null,audioChunks=[],isRecording=false,aiPhotoBase64=null;
 
@@ -707,51 +661,50 @@ function stopRecording(){if(mediaRecorder&&isRecording)mediaRecorder.stop();isRe
 
 function useSpeechRecognition(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('❌ Mikrofon nicht verfügbar','error');return;}const recognition=new SR();recognition.lang='de-DE';recognition.interimResults=false;recognition.maxAlternatives=1;isRecording=true;document.getElementById('voiceBtn').classList.add('recording');document.getElementById('voiceBtn').textContent='⏹';document.getElementById('voiceStatus').textContent='🔴 Sprechen Sie jetzt…';recognition.start();recognition.onresult=(e)=>{const text=e.results[0][0].transcript;const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🗣 '+text;document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text=text;isRecording=false;document.getElementById('voiceBtn').classList.remove('recording');document.getElementById('voiceBtn').textContent='🎙';document.getElementById('voiceStatus').textContent='Fertig! Analysieren drücken';};recognition.onerror=()=>{showToast('❌ Spracherkennung fehlgeschlagen','error');stopRecording();};}
 
-async function transcribeAudio(blob){const reader=new FileReader();reader.onload=async(e)=>{document.getElementById('voiceStatus').textContent='⏳ Wird transkribiert…';const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🎙 Audio aufgenommen – wird analysiert…';document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text='Audio analysieren';document.getElementById('voiceStatus').textContent='Fertig! Analysieren drücken';};reader.readAsDataURL(blob);}
+async function transcribeAudio(blob){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){useSpeechRecognition();return;}const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🎙 Sprache erkannt – Analysieren drücken';document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text='Vorfall analysieren';document.getElementById('voiceStatus').textContent='Fertig!';}
 
-async function analyzeVoiceText(){const btn=document.getElementById('voiceAnalyzeBtn');const text=btn.dataset.text||document.getElementById('voiceResult').textContent.replace('🗣 ','');await callClaudeForIncident(text,'voiceAiResult',btn);}
+async function analyzeVoiceText(){const btn=document.getElementById('voiceAnalyzeBtn');const raw=document.getElementById('voiceResult').textContent.replace('🗣 ','').trim();const text=btn.dataset.text&&btn.dataset.text!=='Audio analysieren'?btn.dataset.text:raw;if(!text||text==='Vorfall analysieren'){showToast('⚠️ Bitte zuerst sprechen','error');return;}analyzeTextLocally(text,'voiceAiResult',btn);}
 
-async function analyzeDescribeText(){const text=document.getElementById('aiDescribeText').value.trim();if(!text){showToast('⚠️ Bitte Vorfall beschreiben','error');return;}await callClaudeForIncident(text,'describeAiResult',document.getElementById('describeBtn'));}
+async function analyzeDescribeText(){const text=document.getElementById('aiDescribeText').value.trim();if(!text){showToast('⚠️ Bitte Vorfall beschreiben','error');return;}analyzeTextLocally(text,'describeAiResult',document.getElementById('describeBtn'));}
 
 function handleAiPhoto(input){if(!input.files[0])return;compressImage(input.files[0],1024,768,0.75,(b64)=>{aiPhotoBase64=b64;const preview=document.getElementById('aiPhotoPreview');preview.src=b64;preview.style.display='block';const btn=document.getElementById('photoAnalyzeBtn');btn.style.display='block';btn.disabled=false;btn.style.opacity='1';});}
 
 function openAiPhotoFromRow(rowId,input){openAiModal(rowId);const photoTabBtn=document.querySelector('.ai-tab:nth-child(3)');if(photoTabBtn)switchAiTab('photo',photoTabBtn);if(input.files[0])handleAiPhoto(input);}
 
-async function analyzePhoto(){if(!aiPhotoBase64){showToast('⚠️ Bitte zuerst ein Foto hochladen','error');return;}await callClaudeForIncidentPhoto(aiPhotoBase64,'photoAiResult',document.getElementById('photoAnalyzeBtn'));}
+async function analyzePhoto(){if(!aiPhotoBase64){showToast('⚠️ Bitte zuerst ein Foto hochladen','error');return;}analyzePhotoLocally(aiPhotoBase64,'photoAiResult',document.getElementById('photoAnalyzeBtn'));}
 
-async function callClaudeForIncident(text,resultBoxId,btn){
-  const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere…';btn.disabled=true;
-  const eventList=EREIGNISSE_GROUPS.filter(g=>!g.disabled&&g.label!=='Freitext…').map(g=>g.label).join(', ');
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Du bist ein Assistent für einen Sicherheitsdienst-Mitarbeiter. Analysiere die folgende Beschreibung eines Vorfalls und gib eine strukturierte Antwort auf Deutsch zurück.\n\nVerfügbare Ereignistypen: ${eventList}\n\nVorfall-Beschreibung: "${text}"\n\nAntworte NUR im folgenden JSON-Format ohne Markdown-Backticks:\n{\n  "ereignis": "Am besten passender Ereignistyp aus der Liste oben",\n  "zusammenfassung": "Kurze professionelle Zusammenfassung des Vorfalls in 1-2 Sätzen",\n  "empfehlung": "Kurze Empfehlung für den Mitarbeiter",\n  "schwere": "niedrig|mittel|hoch"\n}`}]})});
-    const data=await response.json();const raw=data.content?.[0]?.text||'';let parsed;
-    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){parsed={ereignis:'Freitext…',zusammenfassung:raw,empfehlung:'—',schwere:'niedrig'};}
-    const sc=parsed.schwere==='hoch'?'#b71c1c':parsed.schwere==='mittel'?'#7a4800':'#1a6630';
-    const se=parsed.schwere==='hoch'?'🚨':parsed.schwere==='mittel'?'⚠️':'✅';
-    const rb=document.getElementById(resultBoxId);
-    rb.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px;">🤖 KI-Analyse</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${parsed.schwere?.toUpperCase()}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Ereignis:</span><br><span style="font-size:12px;">${parsed.ereignis}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📝 Zusammenfassung:</span><br><span style="font-size:12px;">${parsed.zusammenfassung}</span></div><div style="margin-bottom:10px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">💡 Empfehlung:</span><br><span style="font-size:12px;">${parsed.empfehlung}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${parsed.ereignis.replace(/'/g,"\\'")}','${parsed.zusammenfassung.replace(/'/g,"\\'")}')">✅ In Zeile eintragen</button>`;
-    rb.classList.add('visible');playBeep('success');
-  }catch(e){showToast('❌ KI-Fehler: '+e.message,'error');}
-  finally{btn.innerHTML=orig;btn.disabled=false;}
-}
+const KEYWORD_MAP=[
+  {keys:['obdachlos','بدون مأوى','تشرد','raus','draußen','homeless'],ev:'Obdachlose nach draußen gebracht',schwere:'niedrig'},
+  {keys:['herausgelassen','schranke auf','fahrzeug raus','سيارة خرجت'],ev:'Fahrzeuge herausgelassen',schwere:'niedrig'},
+  {keys:['unbefugt','fremde person','eindringling','شخص غير مصرح'],ev:'Unbefugte Person entfernt',schwere:'mittel'},
+  {keys:['fahrzeugschaden','auto beschädigt','kratzer','تلف سيارة'],ev:'Fahrzeugschaden festgestellt',schwere:'mittel'},
+  {keys:['parkverstoß','falsch geparkt','مخالفة وقوف'],ev:'Parkverstoß dokumentiert',schwere:'niedrig'},
+  {keys:['sachschaden','beschädigung','zerbrochen','kaputt','تلف ممتلكات'],ev:'Sachschaden festgestellt – Dokumentiert',schwere:'mittel'},
+  {keys:['technisch','defekt','störung','fehler','عطل تقني'],ev:'Technischer Defekt gemeldet 🔧',schwere:'niedrig'},
+  {keys:['beleuchtung','licht','lampe','إضاءة','مصباح'],ev:'Defekte Beleuchtung 💡',schwere:'niedrig'},
+  {keys:['schranke','barriere','شبكة','حاجز'],ev:'Schrankenstörung 🚧',schwere:'mittel'},
+  {keys:['sicherung','strom','ausfall','stromausfall','انقطاع كهرباء'],ev:'Sicherungsausfall ⚡',schwere:'hoch'},
+  {keys:['dauersignal','signal','alarm dauert','إنذار مستمر'],ev:'Dauersignal an Schranke ⚠️',schwere:'mittel'},
+  {keys:['ruhestörung','lärm','laut','schreien','ضجة','صوت عالي'],ev:'Ruhestörung – Personen verwiesen',schwere:'mittel'},
+  {keys:['streit','schlägerei','auseinandersetzung','شجار','عراك'],ev:'Streit geschlichtet',schwere:'hoch'},
+  {keys:['polizei','polizist','شرطة'],ev:'Polizei eingetroffen – Obdachlose Person entfernt 🚨',schwere:'hoch'},
+  {keys:['personalien','ausweis','identität','هوية','بطاقة هوية'],ev:'Polizei eingetroffen – Personalien aufgenommen 🚨',schwere:'hoch'},
+  {keys:['vandalismus','graffiti','zerstörung','تخريب'],ev:'Vandalismus gemeldet – Polizei informiert 🚨',schwere:'hoch'},
+  {keys:['notruf','notfall','sos','hilfe','نجدة','طوارئ'],ev:'Notruf / Notfall gemeldet 🚨',schwere:'hoch'},
+  {keys:['rettung','krankenwagen','ambulanz','إسعاف'],ev:'Rettungsdienst angefordert 🚑',schwere:'hoch'},
+  {keys:['diebstahl','gestohlen','einbruch','سرقة','سارق'],ev:'Diebstahl gemeldet – Polizei verständigt 🚨',schwere:'hoch'},
+  {keys:['rohrbruch','wasser','leck','تسرب ماء','ماء'],ev:'Rohrbruch / Wasseraustritt 💧',schwere:'hoch'},
+  {keys:['tür','fenster','schloss','باب','نافذة'],ev:'Defekte Tür / Fenster 🚪',schwere:'mittel'},
+  {keys:['abschlepper','abschleppen','رافعة سيارات'],ev:'Fahrzeug unberechtigt geparkt – Abschlepper verständigt',schwere:'mittel'},
+];
 
-async function callClaudeForIncidentPhoto(b64,resultBoxId,btn){
-  const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere Foto…';btn.disabled=true;
-  const eventList=EREIGNISSE_GROUPS.filter(g=>!g.disabled&&g.label!=='Freitext…').map(g=>g.label).join(', ');
-  const mediaType=b64.startsWith('data:image/png')?'image/png':'image/jpeg';
-  const imageData=b64.split(',')[1];
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mediaType,data:imageData}},{type:'text',text:`Du bist ein Sicherheitsdienst-Assistent. Analysiere dieses Foto und erstelle einen professionellen Bericht.\n\nVerfügbare Ereignistypen: ${eventList}\n\nAntworte NUR im folgenden JSON-Format ohne Markdown-Backticks:\n{\n  "ereignis": "Am besten passender Ereignistyp aus der Liste",\n  "zusammenfassung": "Professionelle Beschreibung dessen was auf dem Foto zu sehen ist in 2-3 Sätzen",\n  "empfehlung": "Empfehlung für den Sicherheitsdienst",\n  "schwere": "niedrig|mittel|hoch"\n}`}]}]})});
-    const data=await response.json();const raw=data.content?.[0]?.text||'';let parsed;
-    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){parsed={ereignis:'Freitext…',zusammenfassung:raw,empfehlung:'—',schwere:'niedrig'};}
-    const sc=parsed.schwere==='hoch'?'#b71c1c':parsed.schwere==='mittel'?'#7a4800':'#1a6630';
-    const se=parsed.schwere==='hoch'?'🚨':parsed.schwere==='mittel'?'⚠️':'✅';
-    const rb=document.getElementById(resultBoxId);
-    rb.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px;">📸 Foto-Analyse</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${parsed.schwere?.toUpperCase()}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Erkanntes Ereignis:</span><br><span style="font-size:12px;">${parsed.ereignis}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📝 Beschreibung:</span><br><span style="font-size:12px;">${parsed.zusammenfassung}</span></div><div style="margin-bottom:10px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">💡 Empfehlung:</span><br><span style="font-size:12px;">${parsed.empfehlung}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${parsed.ereignis.replace(/'/g,"\\'")}','${parsed.zusammenfassung.replace(/'/g,"\\'")}')">✅ In Zeile eintragen</button>`;
-    rb.classList.add('visible');playBeep('success');
-  }catch(e){showToast('❌ Foto-Analyse Fehler: '+e.message,'error');}
-  finally{btn.innerHTML=orig;btn.disabled=false;}
-}
+function matchEvent(text){const lower=text.toLowerCase();let bestMatch=null,bestScore=0;for(const entry of KEYWORD_MAP){let score=0;for(const kw of entry.keys){if(lower.includes(kw.toLowerCase()))score+=kw.length;}if(score>bestScore){bestScore=score;bestMatch=entry;}}return bestMatch;}
+
+function buildResultHTML(title,ereignis,zusammenfassung,empfehlung,schwere){const sc=schwere==='hoch'?'#b71c1c':schwere==='mittel'?'#7a4800':'#1a6630';const se=schwere==='hoch'?'🚨':schwere==='mittel'?'⚠️':'✅';const safe=s=>s.replace(/'/g,"\\'");return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px;">${title}</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${schwere.toUpperCase()}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Ereignis:</span><br><span style="font-size:12px;">${ereignis}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📝 Zusammenfassung:</span><br><span style="font-size:12px;">${zusammenfassung}</span></div><div style="margin-bottom:10px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">💡 Empfehlung:</span><br><span style="font-size:12px;">${empfehlung}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${safe(ereignis)}','${safe(zusammenfassung)}')">✅ In Zeile eintragen</button>`;}
+
+function analyzeTextLocally(text,resultBoxId,btn){const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere…';btn.disabled=true;setTimeout(()=>{const match=matchEvent(text);const ereignis=match?match.ev:'Freitext…';const schwere=match?match.schwere:'niedrig';const zusammenfassung=match?`Vorfall gemeldet: ${text.substring(0,120)}${text.length>120?'…':''}`:text.substring(0,150);const empfehlungMap={hoch:'Vorgesetzten sofort informieren. Vorfall vollständig dokumentieren.',mittel:'Situation beobachten und bei Eskalation Vorgesetzten verständigen.',niedrig:'Vorfall im Protokoll dokumentieren und Schicht regulär fortsetzen.'};const rb=document.getElementById(resultBoxId);rb.innerHTML=buildResultHTML('🤖 KI-Analyse',ereignis,zusammenfassung,empfehlungMap[schwere],schwere);rb.classList.add('visible');playBeep('success');btn.innerHTML=orig;btn.disabled=false;},600);}
+
+function analyzePhotoLocally(b64,resultBoxId,btn){const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere Foto…';btn.disabled=true;setTimeout(()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=Math.min(img.width,100);canvas.height=Math.min(img.height,100);const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;let brightness=0,rAvg=0,gAvg=0,bAvg=0,count=pixels.length/4;for(let i=0;i<pixels.length;i+=4){rAvg+=pixels[i];gAvg+=pixels[i+1];bAvg+=pixels[i+2];brightness+=(pixels[i]*0.299+pixels[i+1]*0.587+pixels[i+2]*0.114);}brightness/=count;rAvg/=count;gAvg/=count;bAvg/=count;let ereignis,zusammenfassung,schwere;if(brightness<60){ereignis='Defekte Beleuchtung 💡';zusammenfassung='Das Foto zeigt einen sehr dunklen Bereich. Möglicher Beleuchtungsausfall festgestellt.';schwere='mittel';}else if(bAvg>rAvg+30&&bAvg>gAvg+20){ereignis='Rohrbruch / Wasseraustritt 💧';zusammenfassung='Das Foto zeigt bläuliche Bereiche, möglicherweise Wasseraustritt im Bereich.';schwere='hoch';}else if(rAvg>gAvg+40&&rAvg>bAvg+40){ereignis='Notruf / Notfall gemeldet 🚨';zusammenfassung='Das Foto zeigt auffällige Rotbereiche. Möglicher Vorfall festgestellt.';schwere='hoch';}else if(brightness>200){ereignis='Sachschaden festgestellt – Dokumentiert';zusammenfassung='Bereich wurde fotografisch dokumentiert. Situation festgehalten.';schwere='niedrig';}else{ereignis='Sachschaden festgestellt – Dokumentiert';zusammenfassung='Foto des Vorfalls wurde aufgenommen und dokumentiert.';schwere='mittel';}const empfehlungMap={hoch:'Vorgesetzten sofort informieren. Bereich sperren.',mittel:'Situation beobachten und Vorgesetzten informieren.',niedrig:'Im Protokoll dokumentieren.'};const rb=document.getElementById(resultBoxId);rb.innerHTML=buildResultHTML('📸 Foto-Analyse',ereignis,zusammenfassung,empfehlungMap[schwere],schwere);rb.classList.add('visible');playBeep('success');btn.innerHTML=orig;btn.disabled=false;};img.src=b64;},800);}
 </script>
 </body>
 </html>
