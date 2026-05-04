@@ -4,30 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Denis Protokoll</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="apple-touch-icon" sizes="192x192" href="icon.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Denis Protokoll">
 <meta name="theme-color" content="#3d5268">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Denis Protokoll">
-<meta name="msapplication-TileColor" content="#3d5268">
-<meta name="msapplication-TileImage" content="icon.png">
-<meta name="description" content="Denis Protokoll – Tagesbericht & Vorfallprotokoll für den Sicherheitsdienst">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
   --red: #E8394A; --red2: #ff6b7a; --green: #4cba6b;
   --orange: #f5a623; --pink: #f5a0a0;
   --bg: #f5f0eb; --card: #ffffff; --border: #E2E5EC;
   --text: #141518; --muted: #8890A0; --row-hover: #fff8f8;
 }
+
 body.dark-mode { --bg:#1a1a1a; --card:#2d2d2d; --border:#444; --text:#e0e0e0; --muted:#888; --row-hover:#3a2a2a; }
 body.dark-mode .cell { background: #333 !important; }
 body.dark-mode .card-header { background: linear-gradient(135deg,#1a2a3a,#0d1a26) !important; }
@@ -35,11 +26,20 @@ body.dark-mode .card-footer { background: #222 !important; }
 body.dark-mode .col-tag { filter: brightness(0.8); }
 body.dark-mode .notiz-select, body.dark-mode .time-input-direct, body.dark-mode .notiz-free { background: #3a3a3a !important; color: var(--text) !important; border-color: #555 !important; }
 body.dark-mode .autosave-bar { background: #1a2a1a !important; }
-body.dark-mode .pwa-banner { background: #1a2a3a !important; border-color: #2a4a6a !important; }
+body.dark-mode .modal-box { background: #2d2d2d !important; color: var(--text); }
+body.dark-mode .modal-box input { background: #3a3a3a; color: var(--text); border-color: #555; }
+
 .proto-row.danger { border-left-color: var(--red) !important; }
 .proto-row.danger .cell { border-color: rgba(232,57,74,0.4) !important; background: #fff5f5 !important; }
 body.dark-mode .proto-row.danger .cell { background: #3a1a1a !important; }
-.autosave-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: #e8f5e9; border-top: 2px solid #4cba6b; display: flex; align-items: center; justify-content: space-between; padding: 6px 16px; font-size: 11px; font-weight: 700; color: #2e7d32; transition: all 0.3s; gap: 10px; }
+
+.autosave-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+  background: #e8f5e9; border-top: 2px solid #4cba6b;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 16px; font-size: 11px; font-weight: 700; color: #2e7d32;
+  transition: all 0.3s; gap: 10px;
+}
 .autosave-bar.saving { background: #fff3e0; border-color: var(--orange); color: #e65100; }
 .autosave-bar.error  { background: #ffebee; border-color: var(--red); color: #b71c1c; }
 .as-dot { width: 8px; height: 8px; border-radius: 50%; background: #4cba6b; flex-shrink: 0; }
@@ -49,32 +49,22 @@ body.dark-mode .proto-row.danger .cell { background: #3a1a1a !important; }
 .as-actions { display: flex; gap: 5px; }
 .as-btn { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; border: 1.5px solid currentColor; background: transparent; cursor: pointer; color: inherit; transition: all 0.15s; }
 .as-btn:hover { opacity: 0.8; }
+
 .toast-wrap { position: fixed; top: 16px; right: 16px; z-index: 9998; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
 .toast { background: #141518; color: white; border-radius: 12px; padding: 10px 16px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toastIn 0.25s ease; max-width: 280px; pointer-events: all; }
 @keyframes toastIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:none;} }
 .toast.success { border-left: 3px solid #4cba6b; }
 .toast.error   { border-left: 3px solid var(--red); }
 .toast.info    { border-left: 3px solid #64b5f6; }
+
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; padding: 24px 16px 70px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body::before { content:''; position:fixed; inset:0; background-image: radial-gradient(circle at 1px 1px, #d4cdc6 1px, transparent 0); background-size: 28px 28px; opacity: 0.5; pointer-events: none; z-index: 0; }
-.pwa-banner { position: fixed; bottom: 46px; left: 0; right: 0; z-index: 998; background: white; border-top: 2px solid #3d5268; display: none; align-items: center; justify-content: space-between; padding: 10px 16px; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.12); }
-.pwa-banner.visible { display: flex; }
-.pwa-banner-icon { font-size: 24px; flex-shrink: 0; }
-.pwa-banner-text { flex: 1; }
-.pwa-banner-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: #3d5268; }
-.pwa-banner-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
-.pwa-banner-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.pwa-install-btn { background: #3d5268; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; }
-.pwa-dismiss-btn { background: transparent; color: var(--muted); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 12px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; }
-.offline-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9997; background: #e65100; color: white; text-align: center; padding: 6px 16px; font-size: 11px; font-weight: 700; }
-.offline-bar.visible { display: block; }
-.sw-update-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9996; background: #1565c0; color: white; padding: 8px 16px; font-size: 11px; font-weight: 700; align-items: center; justify-content: space-between; gap: 10px; }
-.sw-update-bar.visible { display: flex; }
-.sw-update-btn { background: white; color: #1565c0; border: none; border-radius: 6px; padding: 4px 12px; font-size: 10px; font-weight: 700; cursor: pointer; }
+
 .toolbar { position: relative; z-index: 2; max-width: 900px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .toolbar-brand { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
 .toolbar-brand span { color: var(--red); }
 .toolbar-right { display: flex; gap: 6px; flex-wrap: wrap; }
+
 .btn { padding: 9px 16px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.18s; }
 .btn-red { background: var(--red); color: white; box-shadow: 0 4px 12px rgba(232,57,74,0.35); }
 .btn-red:hover { background: #c8102e; transform: translateY(-1px); }
@@ -84,8 +74,7 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .btn-green:hover { background: #1da851; transform: translateY(-1px); }
 .btn-pdf { background: #1565c0; color: white; border: none; }
 .btn-pdf:hover { background: #0d47a1; transform: translateY(-1px); }
-.btn-pwa { background: #3d5268; color: white; border: none; }
-.btn-pwa:hover { background: #2a3d52; transform: translateY(-1px); }
+
 .card { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; background: var(--card); border-radius: 24px; box-shadow: 0 2px 0 #d0d4dc, 0 8px 40px rgba(0,0,0,0.09); overflow: hidden; }
 .card-header { background: linear-gradient(135deg, #4a6080 0%, #3d5268 100%); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .header-left { display: flex; flex-direction: column; gap: 1px; }
@@ -95,6 +84,7 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .header-meta-fields { display: flex; gap: 7px; flex-wrap: wrap; }
 .header-selects { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
 .meta-field { display: flex; flex-direction: column; gap: 2px; }
 .meta-field-label { font-size: 7px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
 .meta-field-input { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: white; background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.18); border-radius: 7px; padding: 4px 8px; outline: none; width: 120px; }
@@ -102,27 +92,33 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .meta-field-input:focus { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
 .proto-refresh { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 6px; color: white; font-size: 12px; font-weight: 700; width: 26px; height: 26px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .proto-refresh:hover { background: rgba(255,255,255,0.25); transform: rotate(180deg); }
+
 .proto-nr-display { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
 .proto-nr-dot { width: 6px; height: 6px; border-radius: 50%; background: #4cba6b; flex-shrink: 0; }
+
 .day-select { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: white; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 4px 8px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; }
 .date-input { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 4px 8px; outline: none; cursor: pointer; }
+
 .status-badge { display: flex; align-items: center; gap: 5px; background: rgba(76,186,107,0.12); border: 1px solid rgba(76,186,107,0.3); border-radius: 20px; padding: 4px 9px; font-size: 10px; font-weight: 700; color: #4cba6b; cursor: pointer; transition: all 0.2s; user-select: none; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4cba6b; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 .status-badge.incident { background: rgba(232,57,74,0.12); border-color: rgba(232,57,74,0.3); color: var(--red); }
 .status-badge.incident .status-dot { background: var(--red); }
+
 .progress-wrap { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
 .progress-label { font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.45); white-space: nowrap; }
 .progress-track { flex: 1; height: 3px; border-radius: 99px; background: rgba(255,255,255,0.12); overflow: hidden; min-width: 60px; }
 .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #ffb3b9, var(--red)); transition: width 1s linear; }
 .progress-time { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); white-space: nowrap; }
 .live-clock { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 2px; }
+
 .col-headers { display: grid; grid-template-columns: 120px 70px 70px 1fr; gap: 6px; padding: 8px 14px 6px; }
 .col-tag { border-radius: 6px; padding: 4px 0; font-size: 10px; font-weight: 700; text-align: center; letter-spacing: 0.5px; }
 .tag-kunde { background: #F0F1F4; color: #666; }
 .tag-beginn { background: #d4f5dc; color: #1a6630; }
 .tag-ende { background: #fde8c4; color: #7a4800; }
 .tag-notiz { background: #fde0e0; color: #8b1a1a; }
+
 .rows-wrap { display: flex; flex-direction: column; gap: 0; padding: 0 14px 6px; }
 .proto-row { display: grid; grid-template-columns: 120px 70px 70px 1fr; gap: 6px; align-items: start; padding: 4px 0; border-bottom: 1px solid var(--border); border-left: 3px solid transparent; transition: border-left-color 0.3s, background 0.15s; animation: rowIn 0.22s ease both; position: relative; }
 .proto-row:last-child { border-bottom: none; }
@@ -131,12 +127,14 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .proto-row.row-empty { border-left-color: #e0e0e0; }
 .proto-row:hover { background: var(--row-hover); border-radius: 10px; }
 @keyframes rowIn { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:none;} }
+
 .cell { border: 1.5px solid var(--border); border-radius: 10px; background: white; display: flex; align-items: center; justify-content: center; padding: 5px; min-height: 46px; overflow: visible; transition: border-color 0.15s, box-shadow 0.15s; }
 .cell:focus-within { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,57,74,0.08); }
 .cell-notiz { align-items: flex-start; flex-direction: column; gap: 4px; padding: 6px 8px; height: auto; min-height: 46px; overflow: visible; }
 .cell-kunde { flex-direction: column; gap: 1px; padding: 4px 8px; justify-content: center; }
 .row-num { font-size: 8px; font-weight: 700; color: var(--muted); letter-spacing: 1px; align-self: flex-start; }
 .cell-kunde select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; font-style: italic; color: var(--text); border: none; background: transparent; outline: none; cursor: pointer; width: 100%; text-align: center; appearance: none; -webkit-appearance: none; margin: auto 0; }
+
 .cell-time { flex-direction: column; gap: 3px; position: relative; padding: 4px; }
 .time-input-direct { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); border: 1.5px solid var(--border); border-radius: 7px; padding: 3px 4px; background: #fafafa; outline: none; width: 100%; text-align: center; cursor: pointer; transition: border-color 0.15s; }
 .time-input-direct:focus { border-color: var(--red); background: white; }
@@ -145,47 +143,104 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .time-input-direct.t-eve   { color: #b45309; border-color: #f5a623; background: #fffbf0; }
 .time-now-btn { font-size: 9px; font-weight: 700; color: var(--muted); background: none; border: 1px dashed var(--border); border-radius: 5px; padding: 2px 5px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .time-now-btn:hover { border-color: var(--red); color: var(--red); }
+
 .kunde-custom { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; font-style: italic; color: var(--text); border: none; background: transparent; outline: none; width: 100%; text-align: center; padding: 0; margin-top: 2px; }
 .kunde-back { font-size: 10px; color: var(--muted); cursor: pointer; margin-top: 2px; display: block; text-align: center; transition: color 0.15s; }
 .kunde-back:hover { color: var(--red); }
+
 .notiz-items { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .notiz-item { display: flex; align-items: center; gap: 4px; animation: rowIn 0.18s ease both; width: 100%; }
 .notiz-select { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--text); border: 1.5px solid var(--border); border-radius: 7px; padding: 3px 6px; background: #fafafa; outline: none; cursor: pointer; flex: 1; min-width: 0; transition: all 0.15s; }
 .notiz-select:focus { border-color: var(--red); }
+
 .nc-wrap { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 .nc-btn { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--border); background: white; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.12s; color: #666; line-height: 1; }
 .nc-btn.p { border-color: var(--red); color: var(--red); }
 .nc-btn.p:hover { background: var(--red); color: white; }
 .nc-btn.m:hover { background: #eee; }
 .nc-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; min-width: 14px; text-align: center; color: var(--text); }
+
 .notiz-del-btn { background: #fff0f1; border: 1.5px solid #f5c0c4; border-radius: 6px; color: var(--red); font-size: 12px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
 .notiz-del-btn:hover { background: var(--red); color: white; border-color: var(--red); transform: scale(1.1); }
+
 .notiz-free { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; color: var(--text); border: 1.5px solid var(--border); border-radius: 7px; padding: 4px 7px; background: #fafafa; outline: none; width: 100%; resize: none; min-height: 32px; transition: border-color 0.15s; }
 .notiz-free:focus { border-color: var(--red); background: white; }
+
 .bottom-actions { display: flex; gap: 4px; margin-top: 2px; flex-wrap: wrap; }
 .tiny-btn { font-size: 9px; font-weight: 700; color: var(--muted); background: none; border: 1.5px dashed var(--border); border-radius: 6px; padding: 2px 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .tiny-btn:hover { border-color: var(--red); color: var(--red); background: rgba(232,57,74,0.04); }
+
 .foto-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; width: 100%; }
-.foto-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
-.foto-thumb { width: 40px; height: 34px; border-radius: 7px; object-fit: cover; border: 1.5px solid var(--border); cursor: zoom-in; transition: transform 0.15s; display: block; }
+.foto-thumb { width: 40px; height: 34px; border-radius: 7px; object-fit: cover; border: 1.5px solid var(--border); cursor: zoom-in; transition: transform 0.15px; flex-shrink: 0; }
 .foto-thumb:hover { transform: scale(1.06); }
-.foto-del { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--red); border: 2px solid white; color: white; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.15s; z-index: 2; }
-.foto-del:hover { transform: scale(1.2); background: #c8102e; }
+
 .add-zone { padding: 10px 16px; display: flex; justify-content: center; align-items: center; gap: 12px; }
 .add-row-btn2 { background: var(--red); color: white; border: none; border-radius: 9px; padding: 8px 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; box-shadow: 0 3px 10px rgba(232,57,74,0.25); }
 .add-row-btn2:hover { background: #c8102e; transform: translateY(-1px); }
 .rm-row-btn { background: white; color: #888; border: 1.5px solid var(--border); border-radius: 9px; padding: 8px 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
 .rm-row-btn:hover { border-color: #e88; color: #e44; background: #fff5f5; }
+
 .card-footer { background: #f8f9fc; border-top: 1.5px solid var(--border); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { background: white; border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 12px; font-size: 10px; font-weight: 700; color: #555; display: flex; align-items: center; gap: 4px; }
 .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
 .footer-brand { font-family: 'Syne', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #c8ccd6; }
 .footer-brand span { color: var(--red); }
+
 .pdf-loading { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; backdrop-filter: blur(4px); }
 .pdf-loading-text { font-family: 'Syne',sans-serif; font-size: 16px; font-weight: 800; color: white; letter-spacing: 2px; }
 .pdf-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── AI FEATURES ── */
+.ai-btn { position: fixed; right: 12px; bottom: 54px; z-index: 998; background: linear-gradient(135deg,#7c3aed,#4f46e5); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 18px; cursor: pointer; box-shadow: 0 3px 16px rgba(124,58,237,0.45); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.ai-btn:hover { transform: scale(1.12); box-shadow: 0 5px 22px rgba(124,58,237,0.6); }
+.ai-btn-pulse { animation: ai-pulse 2s infinite; }
+@keyframes ai-pulse { 0%,100%{box-shadow:0 3px 16px rgba(124,58,237,0.45);} 50%{box-shadow:0 3px 24px rgba(124,58,237,0.75);} }
+.ai-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9995;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px); }
+.ai-modal { background:var(--card);border-radius:24px 24px 0 0;padding:20px 18px 32px;width:100%;max-width:540px;box-shadow:0 -8px 40px rgba(0,0,0,0.25);animation:slideUp 0.3s ease; }
+@keyframes slideUp { from{transform:translateY(100%);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.ai-modal-handle { width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 16px; }
+.ai-modal-title { font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px; }
+.ai-modal-sub { font-size:11px;color:var(--muted);margin-bottom:14px; }
+.ai-tabs { display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap; }
+.ai-tab { flex:1;min-width:80px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;text-align:center; }
+.ai-tab.active { background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;border-color:transparent;box-shadow:0 3px 10px rgba(124,58,237,0.3); }
+body.dark-mode .ai-tab { background:#3a3a3a;border-color:#555; }
+.voice-area { display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 0; }
+.voice-btn { width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;color:white;font-size:28px;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,0.4);transition:all 0.2s;display:flex;align-items:center;justify-content:center; }
+.voice-btn.recording { background:linear-gradient(135deg,var(--red),#c8102e);animation:rec-pulse 1s infinite;box-shadow:0 4px 18px rgba(232,57,74,0.5); }
+@keyframes rec-pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+.voice-status { font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.5px; }
+.voice-result { width:100%;background:#f8f9fc;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--text);min-height:60px;line-height:1.6; }
+body.dark-mode .voice-result { background:#333;border-color:#555; }
+.ai-describe-input { width:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;background:#fafafa;outline:none;resize:none;min-height:80px;transition:border-color 0.15s; }
+.ai-describe-input:focus { border-color:#7c3aed;background:white; }
+body.dark-mode .ai-describe-input { background:#3a3a3a;color:var(--text);border-color:#555; }
+.ai-photo-zone { border:2px dashed var(--border);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafafa; }
+.ai-photo-zone:hover { border-color:#7c3aed;background:#f5f3ff; }
+body.dark-mode .ai-photo-zone { background:#333;border-color:#555; }
+.ai-photo-zone-text { font-size:12px;color:var(--muted);font-weight:600;margin-top:6px; }
+.ai-photo-preview { width:100%;max-height:140px;object-fit:cover;border-radius:10px;margin-top:8px;border:1.5px solid var(--border); }
+.ai-result-box { background:#f5f3ff;border:1.5px solid #c4b5fd;border-radius:12px;padding:10px 12px;font-size:12px;color:#4c1d95;line-height:1.7;margin-top:10px;display:none; }
+body.dark-mode .ai-result-box { background:#2d1f4a;border-color:#6d28d9;color:#c4b5fd; }
+.ai-result-box.visible { display:block;animation:rowIn 0.25s ease; }
+.ai-row-select { font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text);border:1.5px solid var(--border);border-radius:9px;padding:6px 10px;background:#fafafa;outline:none;cursor:pointer;width:100%;margin-bottom:10px;transition:border-color 0.15s; }
+.ai-row-select:focus { border-color:#7c3aed; }
+body.dark-mode .ai-row-select { background:#3a3a3a;color:var(--text);border-color:#555; }
+.ai-actions { display:flex;gap:8px;margin-top:12px;flex-wrap:wrap; }
+.ai-action-btn { flex:1;padding:10px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s; }
+.ai-action-btn.primary { background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;box-shadow:0 3px 10px rgba(124,58,237,0.3); }
+.ai-action-btn.primary:hover { transform:translateY(-1px); }
+.ai-action-btn.primary:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+.ai-action-btn.secondary { background:white;color:#555;border:1.5px solid var(--border); }
+.ai-action-btn.secondary:hover { background:#f5f3ff;border-color:#7c3aed;color:#7c3aed; }
+body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); }
+.ai-spinner { display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px; }
+.ai-tiny-btn { font-size:9px;font-weight:700;color:#7c3aed;background:none;border:1.5px dashed #c4b5fd;border-radius:6px;padding:2px 7px;cursor:pointer;transition:all 0.15s;white-space:nowrap; }
+.ai-tiny-btn:hover { background:#f5f3ff;border-color:#7c3aed; }
+
+/* ── ARCHIVE PANEL ── */
 .archive-btn { position: fixed; left: 12px; bottom: 54px; z-index: 998; background: #3d5268; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 16px; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.25); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
 .archive-btn:hover { transform: scale(1.1); }
 .archive-panel { position: fixed; left: 0; top: 0; bottom: 0; width: 300px; background: var(--card); box-shadow: 4px 0 24px rgba(0,0,0,0.18); z-index: 9990; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
@@ -201,29 +256,40 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 .archive-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px; }
 .archive-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9989; display: none; }
 .archive-overlay.open { display: block; }
+
 .sound-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 9px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; user-select: none; }
+.sound-badge:hover { background: rgba(255,255,255,0.2); }
+
 .shift-day-info { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,179,185,0.15); border: 1px solid rgba(255,179,185,0.3); border-radius: 20px; padding: 3px 9px; font-size: 9px; font-weight: 700; color: rgba(255,220,220,0.9); margin-top: 2px; }
+
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   body { background: white !important; padding: 0 !important; margin: 0; }
   body::before { display: none !important; }
-  a { color: inherit !important; text-decoration: none !important; }
-  a::after, a[href]::after, *::after { content: none !important; display: none !important; }
-  a[href]::before, *::before { content: none !important; }
-  .toolbar, .add-zone, .no-print, .time-now-btn, .bottom-actions, .kunde-back, .progress-wrap, .live-clock, .autosave-bar, .archive-btn, .archive-panel, .archive-overlay, .toast-wrap, .pdf-loading, .sound-badge, .shift-day-info, .pwa-banner, .offline-bar, .sw-update-bar, .foto-del { display: none !important; }
+  a, a[href]::after { display: none !important; content: none !important; }
+  [href]::after { content: none !important; }
+  .toolbar, .add-zone, .no-print, .time-now-btn, .bottom-actions,
+  .kunde-back, .progress-wrap, .live-clock, .autosave-bar,
+  .archive-btn, .archive-panel, .archive-overlay, .toast-wrap,
+  .modal-overlay, .pdf-loading, .sound-badge, .shift-day-info,
+  .ai-btn, .ai-modal-overlay, .ai-tiny-btn { display: none !important; }
   .card { box-shadow: none !important; border-radius: 0 !important; width: 100% !important; max-width: 100% !important; }
   .card-header { padding: 8px 14px !important; }
   .header-title { font-size: 16px !important; }
   .meta-field-input, .day-select, .date-input { font-size: 9px !important; padding: 2px 5px !important; border: none !important; background: transparent !important; color: white !important; }
+  .status-badge { padding: 2px 7px !important; font-size: 8px !important; }
   .col-headers { padding: 6px 12px 4px !important; gap: 4px !important; }
   .col-tag { padding: 2px 0 !important; font-size: 8px !important; }
   .rows-wrap { padding: 0 12px 4px !important; }
   .proto-row { gap: 4px !important; padding: 2px 0 !important; }
+  .proto-row::before { display: none !important; }
   .cell { min-height: 34px !important; padding: 3px 5px !important; border-radius: 6px !important; border-width: 1px !important; }
+  .cell-kunde select, .kunde-custom { font-size: 10px !important; }
   .time-input-direct { border: none !important; background: transparent !important; font-size: 11px !important; padding: 0 !important; font-weight: 700 !important; color: #141518 !important; }
   .notiz-select { font-size: 9px !important; padding: 1px 3px !important; border-radius: 4px !important; }
   .nc-btn, .notiz-del-btn { display: none !important; }
   .nc-num { font-size: 10px !important; font-weight: 800 !important; border: 1px solid #ccc !important; border-radius: 4px !important; padding: 1px 4px !important; }
+  .notiz-item { gap: 3px !important; }
   .notiz-free { font-size: 8px !important; min-height: 20px !important; padding: 2px 4px !important; }
   .foto-thumb { width: 28px !important; height: 24px !important; }
   .card-footer { padding: 5px 14px !important; }
@@ -233,13 +299,10 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
 </style>
 </head>
 <body>
-<div class="offline-bar" id="offlineBar">📵 Kein Internet – App läuft offline</div>
-<div class="sw-update-bar" id="swUpdateBar">
-  <span>🔄 Neue Version verfügbar!</span>
-  <button class="sw-update-btn" onclick="applyUpdate()">Jetzt aktualisieren</button>
-</div>
+
 <div class="toast-wrap" id="toastWrap"></div>
 <div class="archive-overlay" id="archiveOverlay" onclick="closeArchive()"></div>
+
 <div class="archive-panel" id="archivePanel">
   <div class="archive-header">
     <div class="archive-title">📁 Protokoll-Archiv</div>
@@ -247,30 +310,22 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
   </div>
   <div class="archive-list" id="archiveList"></div>
 </div>
+
 <button class="archive-btn no-print" onclick="openArchive()" title="Archiv öffnen">📁</button>
-<div class="pwa-banner" id="pwaBanner">
-  <span class="pwa-banner-icon">🛡️</span>
-  <div class="pwa-banner-text">
-    <div class="pwa-banner-title">Denis Protokoll installieren</div>
-    <div class="pwa-banner-sub">Als App speichern · Offline verfügbar · Kein Browser nötig</div>
-  </div>
-  <div class="pwa-banner-actions">
-    <button class="pwa-dismiss-btn" onclick="dismissPwaBanner()">Später</button>
-    <button class="pwa-install-btn" onclick="installPwa()">📲 Installieren</button>
-  </div>
-</div>
+<button class="ai-btn no-print ai-btn-pulse" onclick="openAiModal()" title="🤖 KI-Assistent">🤖</button>
+
 <div class="toolbar no-print">
   <div class="toolbar-brand">Denis <span>Protokoll</span> · Sicherheitsdienst</div>
   <div class="toolbar-right">
     <button class="btn btn-ghost" onclick="toggleDark()">🌙</button>
     <button class="btn btn-ghost" onclick="toggleSound()" id="soundBtn">🔔</button>
-    <button class="btn btn-pwa" onclick="installPwa()" id="pwaInstallBtn" style="display:none">📲 App</button>
     <button class="btn btn-green" onclick="sendWhatsApp()">📲 WhatsApp</button>
     <button class="btn btn-pdf" onclick="savePdfAndWhatsApp()">📄 PDF → WhatsApp</button>
     <button class="btn btn-ghost" onclick="resetForm()">↺ Reset</button>
     <button class="btn btn-red" onclick="window.print()">🖨 Drucken</button>
   </div>
 </div>
+
 <div class="card" id="mainCard">
   <div class="card-header">
     <div class="header-left">
@@ -293,7 +348,7 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
               <span class="proto-nr-dot"></span>
               <span id="protokollNrText">Wird generiert…</span>
             </div>
-            <button class="proto-refresh no-print" onclick="refreshProtoNr()" title="Neue Nummer generieren">↺</button>
+            <button class="proto-refresh no-print" onclick="refreshProtoNr()" title="Neue Nummer">↺</button>
           </div>
         </div>
         <div class="meta-field">
@@ -314,235 +369,214 @@ body::before { content:''; position:fixed; inset:0; background-image: radial-gra
       </div>
     </div>
   </div>
+
   <div class="col-headers">
     <div class="col-tag tag-kunde">Kunde</div>
     <div class="col-tag tag-beginn">Beginn</div>
     <div class="col-tag tag-ende">Ende</div>
     <div class="col-tag tag-notiz">Dienstnotiz</div>
   </div>
+
   <div class="rows-wrap" id="rowsWrap"></div>
+
   <div class="add-zone no-print">
     <button class="rm-row-btn" onclick="removeLastRow()">− Zeile</button>
     <span id="rowCount" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--muted);min-width:55px;text-align:center;">0 Zeilen</span>
     <button class="add-row-btn2" onclick="addRow()">＋ Zeile</button>
   </div>
+
   <div class="card-footer">
     <div class="chips">
       <div class="chip"><span class="chip-dot"></span><span id="chipK">0 Kunden</span></div>
       <div class="chip"><span class="chip-dot"></span><span id="chipV">0 Vorfälle</span></div>
       <div class="chip"><span class="chip-dot"></span><span id="chipR">0 Zeilen</span></div>
       <div class="chip no-print"><span class="chip-dot" style="background:#64b5f6"></span><span id="chipSave">Gespeichert</span></div>
-      <div class="chip no-print" id="pwaStatusChip" style="display:none"><span class="chip-dot" style="background:#4cba6b"></span><span>📲 App installiert</span></div>
     </div>
     <div class="footer-brand">Denis <span>Protokoll</span></div>
   </div>
 </div>
+
+<!-- AI MODAL -->
+<div class="ai-modal-overlay" id="aiModalOverlay" style="display:none" onclick="closeAiModal(event)">
+  <div class="ai-modal" onclick="event.stopPropagation()">
+    <div class="ai-modal-handle"></div>
+    <div class="ai-modal-title">🤖 <span>KI-Assistent</span></div>
+    <div class="ai-modal-sub">Sprache · Beschreibung · Foto-Analyse</div>
+    <select class="ai-row-select" id="aiRowSelect">
+      <option value="">— Zeile auswählen (optional) —</option>
+    </select>
+    <div class="ai-tabs">
+      <button class="ai-tab active" onclick="switchAiTab('voice',this)">🎙 Sprache</button>
+      <button class="ai-tab" onclick="switchAiTab('describe',this)">✍️ Beschreiben</button>
+      <button class="ai-tab" onclick="switchAiTab('photo',this)">📸 Foto</button>
+    </div>
+    <div id="aiTab-voice">
+      <div class="voice-area">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleRecording()">🎙</button>
+        <div class="voice-status" id="voiceStatus">Tippen zum Starten</div>
+        <div class="voice-result" id="voiceResult" style="display:none"></div>
+      </div>
+      <div class="ai-result-box" id="voiceAiResult"></div>
+      <div class="ai-actions">
+        <button class="ai-action-btn primary" id="voiceAnalyzeBtn" onclick="analyzeVoiceText()" style="display:none">🤖 Analysieren</button>
+        <button class="ai-action-btn secondary" onclick="closeAiModal()">Schließen</button>
+      </div>
+    </div>
+    <div id="aiTab-describe" style="display:none">
+      <textarea class="ai-describe-input" id="aiDescribeText" placeholder="Beschreiben Sie den Vorfall auf Deutsch oder Arabisch…"></textarea>
+      <div class="ai-result-box" id="describeAiResult"></div>
+      <div class="ai-actions">
+        <button class="ai-action-btn primary" id="describeBtn" onclick="analyzeDescribeText()">🤖 Analysieren</button>
+        <button class="ai-action-btn secondary" onclick="closeAiModal()">Schließen</button>
+      </div>
+    </div>
+    <div id="aiTab-photo" style="display:none">
+      <div class="ai-photo-zone" onclick="document.getElementById('aiPhotoInput').click()">
+        <div style="font-size:28px">📸</div>
+        <div class="ai-photo-zone-text">Foto des Vorfalls tippen zum Hochladen</div>
+        <img class="ai-photo-preview" id="aiPhotoPreview" style="display:none">
+      </div>
+      <input type="file" id="aiPhotoInput" accept="image/*" style="display:none" onchange="handleAiPhoto(this)">
+      <div class="ai-result-box" id="photoAiResult"></div>
+      <div class="ai-actions">
+        <button class="ai-action-btn primary" id="photoAnalyzeBtn" onclick="analyzePhoto()" style="display:none;opacity:0.5" disabled>🤖 Foto analysieren</button>
+        <button class="ai-action-btn secondary" onclick="closeAiModal()">Schließen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="autosave-bar no-print" id="autosaveBar">
   <span class="as-dot"></span>
-  <span class="as-text" id="autosaveText">💾 Automatisch gespeichert</span>
+  <span class="as-text" id="autosaveText">💾 Automatisch gespeichert · Alle Daten gesichert</span>
   <div class="as-actions">
     <button class="as-btn" onclick="openArchive()">📁 Archiv</button>
     <button class="as-btn" onclick="exportJSON()">⬇ Export</button>
     <button class="as-btn" onclick="saveToArchive()">💾 Jetzt speichern</button>
   </div>
 </div>
+
 <script>
-let deferredInstallPrompt = null, swRegistration = null;
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-      swRegistration = await navigator.serviceWorker.register('./sw.js');
-      swRegistration.addEventListener('updatefound', () => {
-        const nw = swRegistration.installing;
-        nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller)
-            document.getElementById('swUpdateBar').classList.add('visible');
-        });
-      });
-    } catch(e) {}
-  });
-  navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
-}
-function applyUpdate() { if (swRegistration?.waiting) swRegistration.waiting.postMessage('skipWaiting'); document.getElementById('swUpdateBar').classList.remove('visible'); }
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); deferredInstallPrompt = e;
-  if (!localStorage.getItem('denis_pwa_dismissed')) setTimeout(() => document.getElementById('pwaBanner').classList.add('visible'), 3000);
-  const btn = document.getElementById('pwaInstallBtn'); if (btn) btn.style.display = 'inline-flex';
-});
-window.addEventListener('appinstalled', () => {
-  deferredInstallPrompt = null;
-  document.getElementById('pwaBanner').classList.remove('visible');
-  const btn = document.getElementById('pwaInstallBtn'); if (btn) btn.style.display = 'none';
-  const chip = document.getElementById('pwaStatusChip'); if (chip) chip.style.display = 'flex';
-  showToast('🎉 App erfolgreich installiert!', 'success', 4000);
-});
-async function installPwa() {
-  if (!deferredInstallPrompt) { showToast('💡 Browser-Menü → Zum Homescreen hinzufügen', 'info', 4000); return; }
-  document.getElementById('pwaBanner').classList.remove('visible');
-  const { outcome } = await deferredInstallPrompt.prompt();
-  if (outcome === 'accepted') { deferredInstallPrompt = null; showToast('📲 Installation gestartet…', 'success'); }
-}
-function dismissPwaBanner() { document.getElementById('pwaBanner').classList.remove('visible'); localStorage.setItem('denis_pwa_dismissed','1'); }
-if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
-  setTimeout(() => { const c = document.getElementById('pwaStatusChip'); if (c) c.style.display = 'flex'; }, 500);
-}
-window.addEventListener('online',  () => { document.getElementById('offlineBar').classList.remove('visible'); showToast('✅ Wieder online','success'); });
-window.addEventListener('offline', () => { document.getElementById('offlineBar').classList.add('visible'); showToast('📵 Offline – App läuft weiter!','info',4000); });
-if (!navigator.onLine) document.getElementById('offlineBar').classList.add('visible');
-
 const KUNDEN = ['— Standort —','Galerie','Lüneburg Parkhaus','Fuhle','Parking Millerntorplatz','Parkhaus My Falkenried'];
+
 const EREIGNISSE_GROUPS = [
-  {label:'── Regulär ──',disabled:true},{label:'Obdachlose nach draußen gebracht'},{label:'Fahrzeuge herausgelassen'},{label:'Unbefugte Person entfernt'},{label:'Fahrzeugschaden festgestellt'},{label:'Parkverstoß dokumentiert'},{label:'Sachschaden festgestellt – Dokumentiert'},
-  {label:'── Technisch ⚙️ ──',disabled:true},{label:'Technischer Defekt gemeldet 🔧'},{label:'Defekte Beleuchtung 💡'},{label:'Schrankenstörung 🚧'},
-  {label:'── Warnung ⚠️ ──',disabled:true},{label:'Sicherungsausfall ⚡'},{label:'Dauersignal an Schranke ⚠️'},{label:'Ruhestörung – Personen verwiesen'},{label:'Streit geschlichtet'},
-  {label:'── Notfall 🚨 ──',disabled:true},{label:'Polizei eingetroffen – Obdachlose Person entfernt 🚨'},{label:'Polizei eingetroffen – Personalien aufgenommen 🚨'},{label:'Vandalismus gemeldet – Polizei informiert 🚨'},{label:'Notruf / Notfall gemeldet 🚨'},{label:'Rettungsdienst angefordert 🚑'},{label:'Diebstahl gemeldet – Polizei verständigt 🚨'},{label:'Rohrbruch / Wasseraustritt 💧'},{label:'Defekte Tür / Fenster 🚪'},{label:'Fahrzeug unberechtigt geparkt – Abschlepper verständigt'},{label:'Freitext…'},
+  { label: '── Regulär ──', disabled: true },
+  { label: 'Obdachlose nach draußen gebracht' },
+  { label: 'Fahrzeuge herausgelassen' },
+  { label: 'Unbefugte Person entfernt' },
+  { label: 'Fahrzeugschaden festgestellt' },
+  { label: 'Parkverstoß dokumentiert' },
+  { label: 'Sachschaden festgestellt – Dokumentiert' },
+  { label: '── Technisch ⚙️ ──', disabled: true },
+  { label: 'Technischer Defekt gemeldet 🔧' },
+  { label: 'Defekte Beleuchtung 💡' },
+  { label: 'Schrankenstörung 🚧' },
+  { label: '── Warnung ⚠️ ──', disabled: true },
+  { label: 'Sicherungsausfall ⚡' },
+  { label: 'Dauersignal an Schranke ⚠️' },
+  { label: 'Ruhestörung – Personen verwiesen' },
+  { label: 'Streit geschlichtet' },
+  { label: '── Notfall 🚨 ──', disabled: true },
+  { label: 'Polizei eingetroffen – Obdachlose Person entfernt 🚨' },
+  { label: 'Polizei eingetroffen – Personalien aufgenommen 🚨' },
+  { label: 'Vandalismus gemeldet – Polizei informiert 🚨' },
+  { label: 'Notruf / Notfall gemeldet 🚨' },
+  { label: 'Rettungsdienst angefordert 🚑' },
+  { label: 'Diebstahl gemeldet – Polizei verständigt 🚨' },
+  { label: 'Rohrbruch / Wasseraustritt 💧' },
+  { label: 'Defekte Tür / Fenster 🚪' },
+  { label: 'Fahrzeug unberechtigt geparkt – Abschlepper verständigt' },
+  { label: 'Freitext…' },
 ];
+
 const EVENT_COLORS = {
-  red:['Polizei eingetroffen – Obdachlose Person entfernt 🚨','Polizei eingetroffen – Personalien aufgenommen 🚨','Vandalismus gemeldet – Polizei informiert 🚨','Notruf / Notfall gemeldet 🚨','Rettungsdienst angefordert 🚑','Diebstahl gemeldet – Polizei verständigt 🚨','Rohrbruch / Wasseraustritt 💧','Defekte Tür / Fenster 🚪'],
-  orange:['Sicherungsausfall ⚡','Dauersignal an Schranke ⚠️','Ruhestörung – Personen verwiesen','Streit geschlichtet','Fahrzeug unberechtigt geparkt – Abschlepper verständigt'],
-  blue:['Technischer Defekt gemeldet 🔧','Defekte Beleuchtung 💡','Schrankenstörung 🚧'],
+  red:    ['Polizei eingetroffen – Obdachlose Person entfernt 🚨','Polizei eingetroffen – Personalien aufgenommen 🚨','Vandalismus gemeldet – Polizei informiert 🚨','Notruf / Notfall gemeldet 🚨','Rettungsdienst angefordert 🚑','Diebstahl gemeldet – Polizei verständigt 🚨','Rohrbruch / Wasseraustritt 💧','Defekte Tür / Fenster 🚪'],
+  orange: ['Sicherungsausfall ⚡','Dauersignal an Schranke ⚠️','Ruhestörung – Personen verwiesen','Streit geschlichtet','Fahrzeug unberechtigt geparkt – Abschlepper verständigt'],
+  blue:   ['Technischer Defekt gemeldet 🔧','Defekte Beleuchtung 💡','Schrankenstörung 🚧'],
 };
+
 const DANGER_EVENTS = ['Polizei eingetroffen – Obdachlose Person entfernt 🚨','Polizei eingetroffen – Personalien aufgenommen 🚨','Vandalismus gemeldet – Polizei informiert 🚨','Notruf / Notfall gemeldet 🚨','Rettungsdienst angefordert 🚑','Diebstahl gemeldet – Polizei verständigt 🚨','Streit geschlichtet','Ruhestörung – Personen verwiesen'];
+
 const INIT = [
-  {k:'Lüneburg Parkhaus',b:'17:57',e:'19:13',n:[{ev:'Obdachlose nach draußen gebracht',c:1}]},
-  {k:'Galerie',b:'21:00',e:'21:35',n:[{ev:'Obdachlose nach draußen gebracht',c:1},{ev:'Fahrzeuge herausgelassen',c:1}]},
-  {k:'Fuhle',b:'21:51',e:'21:15',n:[]},{k:'Galerie',b:'23:50',e:'00:00',n:[]},
-  {k:'Fuhle',b:'00:15',e:'01:00',n:[]},{k:'Galerie',b:'01:30',e:'03:00',n:[{ev:'Obdachlose nach draußen gebracht',c:2}]},
-  {k:'Galerie',b:'05:42',e:'06:00',n:[]},{k:'Lüneburg Parkhaus',b:'06:35',e:'07:00',n:[]},
+  { k:'Lüneburg Parkhaus', b:'17:57', e:'19:13', n:[{ev:'Obdachlose nach draußen gebracht',c:1}] },
+  { k:'Galerie',           b:'21:00', e:'21:35', n:[{ev:'Obdachlose nach draußen gebracht',c:1},{ev:'Fahrzeuge herausgelassen',c:1}] },
+  { k:'Fuhle',             b:'21:51', e:'21:15', n:[] },
+  { k:'Galerie',           b:'23:50', e:'00:00', n:[] },
+  { k:'Fuhle',             b:'00:15', e:'01:00', n:[] },
+  { k:'Galerie',           b:'01:30', e:'03:00', n:[{ev:'Obdachlose nach draußen gebracht',c:2}] },
+  { k:'Galerie',           b:'05:42', e:'06:00', n:[] },
+  { k:'Lüneburg Parkhaus', b:'06:35', e:'07:00', n:[] },
 ];
-let rowId=0, statusOk=true;
-const nCounts={};
-let soundEnabled=localStorage.getItem('denis_sound')!=='0', autoSaveTimer=null, pendingSave=false, currentProtoNr='';
 
-function getShiftDate() { const now=new Date(); if (now.getHours()<17){const y=new Date(now);y.setDate(y.getDate()-1);return y;} return now; }
-function getShiftDayLabel(d){return['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()];}
-function formatDateISO(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function formatDateDE(d){return`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;}
-(function initShiftDateTime(){
-  const sd=getShiftDate(),now=new Date();
-  document.getElementById('dateInput').value=formatDateISO(sd);
-  document.getElementById('daySelect').value=getShiftDayLabel(sd);
-  const si=document.getElementById('shiftDayInfo');
-  if(si) si.textContent=now.getHours()<17?`📅 Nachtschicht von gestern (${formatDateDE(sd)})`:`📅 Schicht ab heute (${formatDateDE(sd)})`;
-})();
-function generateProtoNr(increment=true){
-  const d=getShiftDate();
-  const dateKey=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-  const storedKey=localStorage.getItem('denis_proto_date');
-  let counter=1;
-  if(storedKey===dateKey){counter=parseInt(localStorage.getItem('denis_proto_seq')||'0');if(increment)counter++;}
-  if(increment||storedKey!==dateKey){localStorage.setItem('denis_proto_date',dateKey);localStorage.setItem('denis_proto_seq',counter);}
-  return`${formatDateDE(d)} – NR-${String(counter).padStart(3,'0')}`;
+let rowId = 0, statusOk = true;
+const nCounts = {};
+let soundEnabled = localStorage.getItem('denis_sound') !== '0';
+let autoSaveTimer = null, pendingSave = false, currentProtoNr = '';
+
+function getShiftDate() {
+  const now = new Date();
+  if (now.getHours() < 17) {
+    const y = new Date(now); y.setDate(y.getDate()-1); return y;
+  }
+  return now;
 }
-function applyProtoNr(nr){currentProtoNr=nr;const el=document.getElementById('protokollNrText');if(el)el.textContent=nr;}
-function refreshProtoNr(){applyProtoNr(generateProtoNr(true));showToast('🔄 Neue Protokoll-Nr. generiert','info');saveData();}
+function getShiftDayLabel(d) { return ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()]; }
+function formatDateISO(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function formatDateDE(d) { return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; }
 
-const AudioCtx=window.AudioContext||window.webkitAudioContext;
+(function initShiftDateTime() {
+  const sd = getShiftDate(), now = new Date();
+  document.getElementById('dateInput').value = formatDateISO(sd);
+  document.getElementById('daySelect').value = getShiftDayLabel(sd);
+  const si = document.getElementById('shiftDayInfo');
+  if (si) si.textContent = now.getHours() < 17 ? `📅 Nachtschicht von gestern (${formatDateDE(sd)})` : `📅 Schicht ab heute (${formatDateDE(sd)})`;
+})();
+
+function generateProtoNr(increment=true) {
+  const d = getShiftDate();
+  const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const storedKey = localStorage.getItem('denis_proto_date');
+  let counter = 1;
+  if (storedKey===dateKey) { counter=parseInt(localStorage.getItem('denis_proto_seq')||'0'); if(increment) counter++; }
+  if (increment||storedKey!==dateKey) { localStorage.setItem('denis_proto_date',dateKey); localStorage.setItem('denis_proto_seq',counter); }
+  return `${formatDateDE(d)} – NR-${String(counter).padStart(3,'0')}`;
+}
+function applyProtoNr(nr) { currentProtoNr=nr; const el=document.getElementById('protokollNrText'); if(el) el.textContent=nr; }
+function refreshProtoNr() { applyProtoNr(generateProtoNr(true)); showToast('🔄 Neue Protokoll-Nr. generiert','info'); saveData(); }
+
+const AudioCtx = window.AudioContext||window.webkitAudioContext;
 let audioCtx=null;
-function getAudioCtx(){if(!audioCtx){try{audioCtx=new AudioCtx();}catch(e){}}return audioCtx;}
-function playBeep(type='save'){
-  if(!soundEnabled)return;const ctx=getAudioCtx();if(!ctx)return;
-  const osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.connect(gain);gain.connect(ctx.destination);
+function getAudioCtx() { if(!audioCtx){try{audioCtx=new AudioCtx();}catch(e){}} return audioCtx; }
+function playBeep(type='save') {
+  if(!soundEnabled) return;
+  const ctx=getAudioCtx(); if(!ctx) return;
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
   if(type==='save'){osc.frequency.value=880;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);osc.start();osc.stop(ctx.currentTime+0.2);}
   if(type==='danger'){osc.frequency.value=440;gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}
   if(type==='success'){osc.frequency.value=660;gain.gain.setValueAtTime(0.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3);}
 }
-function toggleSound(){
-  soundEnabled=!soundEnabled;localStorage.setItem('denis_sound',soundEnabled?'1':'0');
-  document.getElementById('soundBadge').textContent=soundEnabled?'🔔 Ton':'🔕 Stumm';
-  document.getElementById('soundBtn').textContent=soundEnabled?'🔔':'🔕';
+function toggleSound() {
+  soundEnabled=!soundEnabled; localStorage.setItem('denis_sound',soundEnabled?'1':'0');
+  const b=document.getElementById('soundBadge'); if(b) b.textContent=soundEnabled?'🔔 Ton':'🔕 Stumm';
+  const btn=document.getElementById('soundBtn'); if(btn) btn.textContent=soundEnabled?'🔔':'🔕';
   showToast(soundEnabled?'🔔 Ton aktiviert':'🔕 Ton deaktiviert','info');
 }
-if(!soundEnabled)setTimeout(()=>{document.getElementById('soundBadge').textContent='🔕 Stumm';document.getElementById('soundBtn').textContent='🔕';},100);
+if(!soundEnabled){setTimeout(()=>{const b=document.getElementById('soundBadge');if(b)b.textContent='🔕 Stumm';const btn=document.getElementById('soundBtn');if(btn)btn.textContent='🔕';},100);}
 
-function showToast(msg,type='success',duration=2500){
-  const wrap=document.getElementById('toastWrap'),t=document.createElement('div');
-  t.className=`toast ${type}`;t.innerHTML=msg;wrap.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300);},duration);
-}
-function buildEreignisOptions(selected){
-  let html=`<option value="">— Ereignis —</option>`;
-  EREIGNISSE_GROUPS.forEach(g=>{
-    if(g.disabled)html+=`<option disabled style="color:#aaa;font-size:10px;">${g.label}</option>`;
-    else html+=`<option${g.label===selected?' selected':''}>${g.label}</option>`;
-  });
-  return html;
-}
+function showToast(msg,type='success',duration=2500){const wrap=document.getElementById('toastWrap');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=msg;wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300);},duration);}
+
+function buildEreignisOptions(selected){let html=`<option value="">— Ereignis —</option>`;EREIGNISSE_GROUPS.forEach(g=>{if(g.disabled)html+=`<option disabled style="color:#aaa;font-size:10px;">${g.label}</option>`;else html+=`<option${g.label===selected?' selected':''}>${g.label}</option>`;});return html;}
 function getEventColor(val){if(EVENT_COLORS.red.includes(val))return'red';if(EVENT_COLORS.orange.includes(val))return'orange';if(EVENT_COLORS.blue.includes(val))return'blue';return'none';}
-function updateNotizSelectStyle(sel){
-  const c=getEventColor(sel.value);
-  sel.style.background=c==='red'?'#ffecec':c==='orange'?'#fff8e6':c==='blue'?'#e8f4ff':'';
-  sel.style.color=c==='red'?'#b71c1c':c==='orange'?'#7a4800':c==='blue'?'#1a4a7a':'';
-  sel.style.borderColor=c==='red'?'#e88':c==='orange'?'#f5a623':c==='blue'?'#90caf9':'';
-  const row=sel.closest('.proto-row');if(row)checkDanger(row);
-  updateSummary();
-}
-function checkDanger(row){
-  const hasDanger=Array.from(row.querySelectorAll('.notiz-select')).some(s=>DANGER_EVENTS.includes(s.value));
-  const was=row.classList.contains('danger');row.classList.toggle('danger',hasDanger);
-  if(hasDanger&&!was)playBeep('danger');
-}
-function colorTime(input){
-  const val=input.value;if(!val)return;const h=parseInt(val.split(':')[0]);
-  input.classList.remove('t-night','t-day','t-eve');
-  if(h>=6&&h<17)input.classList.add('t-day');else if(h>=17&&h<22)input.classList.add('t-eve');else input.classList.add('t-night');
-}
-function setNow(inputId){const now=new Date(),el=document.getElementById(inputId);if(el){el.value=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;colorTime(el);}}
-function toggleStatus(){
-  statusOk=!statusOk;
-  document.getElementById('statusBadge').className='status-badge'+(statusOk?'':' incident');
-  document.getElementById('statusText').textContent=statusOk?'Regulär':'Vorfall aktiv';
-  if(!statusOk)playBeep('danger');
-}
+function updateNotizSelectStyle(sel){const c=getEventColor(sel.value);sel.style.background=c==='red'?'#ffecec':c==='orange'?'#fff8e6':c==='blue'?'#e8f4ff':'';sel.style.color=c==='red'?'#b71c1c':c==='orange'?'#7a4800':c==='blue'?'#1a4a7a':'';sel.style.borderColor=c==='red'?'#e88':c==='orange'?'#f5a623':c==='blue'?'#90caf9':'';const row=sel.closest('.proto-row');if(row)checkDanger(row);updateSummary();}
+function checkDanger(row){const hD=Array.from(row.querySelectorAll('.notiz-select')).some(s=>DANGER_EVENTS.includes(s.value));const was=row.classList.contains('danger');row.classList.toggle('danger',hD);if(hD&&!was)playBeep('danger');}
+function colorTime(input){const val=input.value;if(!val)return;const h=parseInt(val.split(':')[0]);input.classList.remove('t-night','t-day','t-eve');if(h>=6&&h<17)input.classList.add('t-day');else if(h>=17&&h<22)input.classList.add('t-eve');else input.classList.add('t-night');}
+function setNow(inputId){const now=new Date();const el=document.getElementById(inputId);if(el){el.value=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;colorTime(el);}}
 
-// ── IMAGE COMPRESSION ──
-async function compressImage(file,maxKB=200,maxDim=1200){
-  return new Promise((resolve)=>{
-    const reader=new FileReader();
-    reader.onload=(e)=>{
-      const img=new Image();
-      img.onload=()=>{
-        let w=img.width,h=img.height;
-        if(w>maxDim||h>maxDim){if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}}
-        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
-        const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
-        let quality=0.82,b64=canvas.toDataURL('image/jpeg',quality);
-        while(b64.length*0.75>maxKB*1024&&quality>0.2){quality-=0.08;b64=canvas.toDataURL('image/jpeg',quality);}
-        resolve({b64,sizeKB:Math.round(b64.length*0.75/1024),w,h});
-      };
-      img.src=e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-function addFotoThumb(rId,b64){
-  const fr=document.getElementById(`fr-${rId}`);
-  const wrap=document.createElement('div');wrap.className='foto-wrap';
-  const img=document.createElement('img');img.src=b64;img.className='foto-thumb';img.dataset.b64=b64;img.onclick=()=>window.open(b64,'_blank');
-  const del=document.createElement('button');del.className='foto-del no-print';del.innerHTML='✕';del.title='Foto löschen';
-  del.onclick=(e)=>{e.stopPropagation();wrap.style.transition='all 0.2s';wrap.style.opacity='0';wrap.style.transform='scale(0.7)';setTimeout(()=>{wrap.remove();updateSummary();},200);showToast('🗑 Foto gelöscht','info');};
-  wrap.appendChild(img);wrap.appendChild(del);fr.appendChild(wrap);
-}
-async function addFoto(rId,input){
-  if(!input.files[0])return;
-  const file=input.files[0],origKB=Math.round(file.size/1024);
-  const fr=document.getElementById(`fr-${rId}`);
-  const spinner=document.createElement('div');
-  spinner.style.cssText='width:40px;height:34px;border-radius:7px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;background:#f8f8f8;flex-shrink:0;';
-  spinner.innerHTML=`<div style="width:14px;height:14px;border:2px solid #ddd;border-top-color:var(--red);border-radius:50%;animation:spin 0.7s linear infinite;"></div>`;
-  fr.appendChild(spinner);
-  try{
-    const{b64,sizeKB}=await compressImage(file);
-    spinner.remove();addFotoThumb(rId,b64);updateSummary();
-    const saved=origKB>sizeKB?` · ${origKB}KB → ${sizeKB}KB`:'';
-    showToast(`📸 Foto gespeichert${saved}`,'success');playBeep('success');
-  }catch(e){spinner.remove();showToast('❌ Foto-Fehler','error');}
-  input.value='';
-}
+function toggleStatus(){statusOk=!statusOk;document.getElementById('statusBadge').className='status-badge'+(statusOk?'':' incident');document.getElementById('statusText').textContent=statusOk?'Regulär':'Vorfall aktiv';if(!statusOk)playBeep('danger');}
 
 function addRow(data){
-  const id=++rowId;nCounts[id]=[];
+  const id=++rowId; nCounts[id]=[];
   const k=data?.k||'— Standort —',bv=data?.b||'00:00',ev=data?.e||'00:00';
   const isCustom=!KUNDEN.includes(k)&&k!=='— Standort —';
   const div=document.createElement('div');div.className='proto-row';div.id=`row-${id}`;
@@ -569,241 +603,155 @@ function addRow(data){
       <div class="foto-row" id="fr-${id}"></div>
       <div class="bottom-actions">
         <button class="tiny-btn" onclick="addNotiz(${id})">＋ Ereignis</button>
+        <button class="tiny-btn ai-tiny-btn" onclick="openAiModal(${id})">🤖 KI</button>
         <button class="tiny-btn" onclick="document.getElementById('fi-${id}').click()">📎 Foto</button>
+        <button class="tiny-btn" onclick="document.getElementById('fiai-${id}').click()">📸 KI-Foto</button>
         <button class="tiny-btn" style="color:#e88;" onclick="removeRow(${id})">✕ Zeile</button>
         <input type="file" id="fi-${id}" accept="image/*" style="display:none" onchange="addFoto(${id},this)">
+        <input type="file" id="fiai-${id}" accept="image/*" style="display:none" onchange="openAiPhotoFromRow(${id},this)">
       </div>
-    </div>`;
+    </div>
+  `;
   document.getElementById('rowsWrap').appendChild(div);
   if(data?.n)data.n.forEach(n=>addNotiz(id,n.ev,n.c,n.ft||''));
-  if(data?.photos&&data.photos.length)data.photos.forEach(b64=>addFotoThumb(id,b64));
-  setTimeout(()=>{const bd=document.getElementById(`bd-${id}`),ed=document.getElementById(`ed-${id}`);if(bd)colorTime(bd);if(ed)colorTime(ed);},0);
+  if(data?.photos&&data.photos.length){data.photos.forEach(b64=>{const fr=document.getElementById(`fr-${id}`);const wrap=document.createElement('div');wrap.style.cssText='position:relative;display:inline-flex;flex-shrink:0;';wrap.dataset.b64=b64;const img=document.createElement('img');img.src=b64;img.className='foto-thumb';img.dataset.b64=b64;img.onclick=()=>window.open(b64,'_blank');const delBtn=document.createElement('button');delBtn.textContent='✕';delBtn.className='no-print';delBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);color:white;border:none;font-size:9px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10;padding:0;';delBtn.onclick=(e)=>{e.stopPropagation();wrap.style.opacity='0';wrap.style.transition='opacity 0.2s';setTimeout(()=>{wrap.remove();updateSummary();},200);};wrap.appendChild(img);wrap.appendChild(delBtn);fr.appendChild(wrap);});}
+  setTimeout(()=>{const bd=document.getElementById(`bd-${id}`);const ed=document.getElementById(`ed-${id}`);if(bd)colorTime(bd);if(ed)colorTime(ed);},0);
   updateSummary();
 }
 function removeLastRow(){const rows=document.querySelectorAll('.proto-row');if(!rows.length)return;const last=rows[rows.length-1];last.style.cssText+='opacity:0;transform:translateX(20px);transition:all 0.2s';setTimeout(()=>{last.remove();updateSummary();},200);}
 function removeRow(id){const el=document.getElementById(`row-${id}`);if(el){el.style.cssText+='opacity:0;transform:translateX(20px);transition:all 0.2s';setTimeout(()=>{el.remove();updateSummary();},200);}}
 
 function addNotiz(rId,ereignis,count,freeText){
-  const ni=document.getElementById(`ni-${rId}`),idx=nCounts[rId].length;nCounts[rId].push(count||0);
-  const isFree=ereignis==='Freitext…';
-  const item=document.createElement('div');item.className='notiz-item';item.id=`ni-${rId}-${idx}`;
-  item.innerHTML=`
-    <div class="nc-wrap">
-      <button class="nc-btn m" onclick="chN(${rId},${idx},-1)">−</button>
-      <span class="nc-num" id="nc-${rId}-${idx}">${count||0}</span>
-      <button class="nc-btn p" onclick="chN(${rId},${idx},+1)">+</button>
-    </div>
-    <select class="notiz-select" onchange="updateNotizSelectStyle(this);onNChange(this,${rId},${idx})">
-      ${buildEreignisOptions(ereignis||'')}
-    </select>
-    <button class="notiz-del-btn no-print" onclick="deleteNotiz(this)">🗑</button>`;
+  const ni=document.getElementById(`ni-${rId}`);const idx=nCounts[rId].length;nCounts[rId].push(count||0);
+  const isFree=ereignis==='Freitext…';const item=document.createElement('div');item.className='notiz-item';item.id=`ni-${rId}-${idx}`;
+  item.innerHTML=`<div class="nc-wrap"><button class="nc-btn m" onclick="chN(${rId},${idx},-1)">−</button><span class="nc-num" id="nc-${rId}-${idx}">${count||0}</span><button class="nc-btn p" onclick="chN(${rId},${idx},+1)">+</button></div><select class="notiz-select" onchange="updateNotizSelectStyle(this);onNChange(this,${rId},${idx})">${buildEreignisOptions(ereignis||'')}</select><button class="notiz-del-btn no-print" onclick="deleteNotiz(this)">🗑</button>`;
   ni.appendChild(item);
   const ta=document.createElement('textarea');ta.className='notiz-free';ta.value=freeText||'';ta.style.display=isFree?'block':'none';ni.appendChild(ta);
   const sel=item.querySelector('.notiz-select');if(sel&&sel.value)updateNotizSelectStyle(sel);
   updateSummary();
 }
-function deleteNotiz(btn){const item=btn.closest('.notiz-item'),next=item.nextElementSibling;if(next&&next.tagName==='TEXTAREA')next.remove();item.style.opacity='0';item.style.transform='translateX(10px)';item.style.transition='all 0.18s';setTimeout(()=>{item.remove();updateSummary();},180);}
+function deleteNotiz(btn){const item=btn.closest('.notiz-item');const next=item.nextElementSibling;if(next&&next.tagName==='TEXTAREA')next.remove();item.style.opacity='0';item.style.transform='translateX(10px)';item.style.transition='all 0.18s';setTimeout(()=>{item.remove();updateSummary();},180);}
 function onNChange(sel,rId,idx){const ta=document.getElementById(`ni-${rId}-${idx}`)?.nextElementSibling;if(ta&&ta.tagName==='TEXTAREA')ta.style.display=sel.value==='Freitext…'?'block':'none';updateSummary();}
 function chN(rId,idx,d){nCounts[rId][idx]=Math.max(0,(nCounts[rId][idx]||0)+d);document.getElementById(`nc-${rId}-${idx}`).textContent=nCounts[rId][idx];updateSummary();}
-function onKundeChange(sel,id){const cust=document.getElementById(`kcust-${id}`),back=document.getElementById(`kback-${id}`);if(sel.value==='__custom__'){sel.style.display='none';cust.style.display='block';back.style.display='inline';cust.focus();}else{cust.style.display='none';back.style.display='none';sel.style.display='block';}updateSummary();}
+function onKundeChange(sel,id){const cust=document.getElementById(`kcust-${id}`);const back=document.getElementById(`kback-${id}`);if(sel.value==='__custom__'){sel.style.display='none';cust.style.display='block';back.style.display='inline';cust.focus();}else{cust.style.display='none';back.style.display='none';sel.style.display='block';}updateSummary();}
 function resetKunde(id){document.getElementById(`ksel-${id}`).value='— Standort —';document.getElementById(`ksel-${id}`).style.display='block';document.getElementById(`kcust-${id}`).style.display='none';document.getElementById(`kback-${id}`).style.display='none';updateSummary();}
 
-function updateSummary(){
-  const rows=document.querySelectorAll('.proto-row');let kC=0,vC=0;
-  rows.forEach(row=>{
-    const sel=row.querySelector('select'),hasKunde=sel&&sel.value!=='— Standort —';
-    let total=0;row.querySelectorAll('.nc-num').forEach(n=>{total+=parseInt(n.textContent)||0;});
-    vC+=total;if(hasKunde)kC++;
-    row.classList.remove('row-ok','row-warn','row-empty');
-    if(!hasKunde)row.classList.add('row-empty');
-    else if(row.querySelectorAll('.nc-num').length>0&&total>0)row.classList.add('row-warn');
-    else row.classList.add('row-ok');
-    checkDanger(row);
-  });
-  document.getElementById('chipK').textContent=kC+' Kunden';
-  document.getElementById('chipV').textContent=vC+' Vorfälle';
-  document.getElementById('chipR').textContent=rows.length+' Zeilen';
-  const rc=document.getElementById('rowCount');if(rc)rc.textContent=rows.length+' Zeilen';
-  scheduleSave();
-}
+function compressImage(file,maxW,maxH,quality,callback){const reader=new FileReader();reader.onload=(e)=>{const image=new Image();image.onload=()=>{let w=image.width,h=image.height;if(w>maxW||h>maxH){const ratio=Math.min(maxW/w,maxH/h);w=Math.round(w*ratio);h=Math.round(h*ratio);}const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(image,0,0,w,h);callback(canvas.toDataURL('image/jpeg',quality));};image.src=e.target.result;};reader.readAsDataURL(file);}
+
+function addFoto(rId,input){if(!input.files[0])return;compressImage(input.files[0],800,600,0.55,(b64)=>{const fr=document.getElementById(`fr-${rId}`);const wrap=document.createElement('div');wrap.style.cssText='position:relative;display:inline-flex;flex-shrink:0;';wrap.dataset.b64=b64;const img=document.createElement('img');img.src=b64;img.className='foto-thumb';img.dataset.b64=b64;img.onclick=()=>window.open(b64,'_blank');const delBtn=document.createElement('button');delBtn.textContent='✕';delBtn.className='no-print';delBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);color:white;border:none;font-size:9px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10;padding:0;';delBtn.onclick=(e)=>{e.stopPropagation();wrap.style.opacity='0';wrap.style.transition='opacity 0.2s';setTimeout(()=>{wrap.remove();updateSummary();},200);};wrap.appendChild(img);wrap.appendChild(delBtn);fr.appendChild(wrap);input.value='';updateSummary();showToast('📸 Foto komprimiert & gespeichert','success');playBeep('success');});}
+
+function updateSummary(){const rows=document.querySelectorAll('.proto-row');let kC=0,vC=0;rows.forEach(row=>{const sel=row.querySelector('select');const hasKunde=sel&&sel.value!=='— Standort —';const hasNotiz=row.querySelectorAll('.nc-num').length>0;let total=0;row.querySelectorAll('.nc-num').forEach(n=>{total+=parseInt(n.textContent)||0;});vC+=total;if(hasKunde)kC++;row.classList.remove('row-ok','row-warn','row-empty');if(!hasKunde)row.classList.add('row-empty');else if(hasNotiz&&total>0)row.classList.add('row-warn');else row.classList.add('row-ok');checkDanger(row);});document.getElementById('chipK').textContent=kC+' Kunden';document.getElementById('chipV').textContent=vC+' Vorfälle';document.getElementById('chipR').textContent=rows.length+' Zeilen';const rc=document.getElementById('rowCount');if(rc)rc.textContent=rows.length+' Zeilen';scheduleSave();}
+
 function toggleDark(){document.body.classList.toggle('dark-mode');localStorage.setItem('denis_dark',document.body.classList.contains('dark-mode')?'1':'0');}
 if(localStorage.getItem('denis_dark')==='1')document.body.classList.add('dark-mode');
 
-function scheduleSave(){
-  pendingSave=true;clearTimeout(autoSaveTimer);
-  autoSaveTimer=setTimeout(()=>{saveData();pendingSave=false;},800);
-  const bar=document.getElementById('autosaveBar'),txt=document.getElementById('autosaveText');
-  if(bar)bar.className='autosave-bar saving no-print';if(txt)txt.textContent='⏳ Speichern…';
-}
-function collectData(){
-  const rows=document.querySelectorAll('.proto-row');
-  const data={day:document.getElementById('daySelect').value,date:document.getElementById('dateInput').value,protokollNr:currentProtoNr,mitarbeiter:document.getElementById('mitarbeiterName')?.value||'',status:statusOk,savedAt:new Date().toISOString(),rows:[]};
-  rows.forEach(row=>{
-    const id=row.id.replace('row-','');
-    const ksel=document.getElementById(`ksel-${id}`),kcust=document.getElementById(`kcust-${id}`);
-    const bd=document.getElementById(`bd-${id}`),ed=document.getElementById(`ed-${id}`);
-    const ni=document.getElementById(`ni-${id}`),fr=document.getElementById(`fr-${id}`);
-    const isCustom=kcust&&kcust.style.display!=='none';
-    const kunde=isCustom?kcust.value:(ksel?ksel.value:'— Standort —');
-    const notizen=[];
-    if(ni){ni.querySelectorAll('.notiz-item').forEach(item=>{const s=item.querySelector('.notiz-select'),n=item.querySelector('.nc-num'),t=item.nextElementSibling;notizen.push({ev:s?s.value:'',c:n?parseInt(n.textContent)||0:0,ft:(t&&t.tagName==='TEXTAREA')?t.value:''});});}
-    const photos=[];
-    if(fr){fr.querySelectorAll('img.foto-thumb').forEach(img=>{if(img.dataset.b64)photos.push(img.dataset.b64);else if(img.src&&img.src.startsWith('data:'))photos.push(img.src);});}
-    data.rows.push({k:kunde,b:bd?bd.value:'00:00',e:ed?ed.value:'00:00',n:notizen,photos});
-  });
-  return data;
-}
-function saveData(){
-  try{
-    const data=collectData();localStorage.setItem('denis_protokoll',JSON.stringify(data));
-    const bar=document.getElementById('autosaveBar'),txt=document.getElementById('autosaveText'),chip=document.getElementById('chipSave');
-    const now=new Date(),timeStr=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-    if(bar)bar.className='autosave-bar no-print';if(txt)txt.textContent=`💾 Automatisch gespeichert um ${timeStr}`;if(chip)chip.textContent=`💾 ${timeStr}`;
-    playBeep('save');
-  }catch(e){
-    const bar=document.getElementById('autosaveBar'),txt=document.getElementById('autosaveText');
-    if(bar)bar.className='autosave-bar error no-print';if(txt)txt.textContent='❌ Speicherfehler – Speicher voll?';showToast('❌ Speicherfehler!','error');
-  }
-}
-function loadData(){
-  try{
-    const saved=localStorage.getItem('denis_protokoll');if(!saved)return false;
-    const data=JSON.parse(saved);
-    if(data.day)document.getElementById('daySelect').value=data.day;
-    if(data.date)document.getElementById('dateInput').value=data.date;
-    if(data.protokollNr)applyProtoNr(data.protokollNr);
-    if(data.mitarbeiter)document.getElementById('mitarbeiterName').value=data.mitarbeiter;
-    if(data.status===false)toggleStatus();
-    if(data.rows&&data.rows.length){data.rows.forEach(r=>addRow(r));return true;}
-  }catch(e){}
-  return false;
-}
-function saveToArchive(){
-  const data=collectData(),key=`denis_archive_${Date.now()}`;
-  try{localStorage.setItem(key,JSON.stringify(data));showToast('📁 Im Archiv gespeichert!','success');playBeep('success');}
-  catch(e){showToast('❌ Archiv voll','error');}
-}
+function scheduleSave(){pendingSave=true;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(()=>{saveData();pendingSave=false;},800);const bar=document.getElementById('autosaveBar');const txt=document.getElementById('autosaveText');if(bar)bar.className='autosave-bar saving no-print';if(txt)txt.textContent='⏳ Speichern…';}
+
+function collectData(){const rows=document.querySelectorAll('.proto-row');const data={day:document.getElementById('daySelect').value,date:document.getElementById('dateInput').value,protokollNr:currentProtoNr,mitarbeiter:document.getElementById('mitarbeiterName')?.value||'',status:statusOk,savedAt:new Date().toISOString(),rows:[]};rows.forEach(row=>{const id=row.id.replace('row-','');const ksel=document.getElementById(`ksel-${id}`);const kcust=document.getElementById(`kcust-${id}`);const bd=document.getElementById(`bd-${id}`);const ed=document.getElementById(`ed-${id}`);const ni=document.getElementById(`ni-${id}`);const fr=document.getElementById(`fr-${id}`);const isCustom=kcust&&kcust.style.display!=='none';const kunde=isCustom?kcust.value:(ksel?ksel.value:'— Standort —');const notizen=[];if(ni){ni.querySelectorAll('.notiz-item').forEach(item=>{const s=item.querySelector('.notiz-select');const n=item.querySelector('.nc-num');const t=item.nextElementSibling;notizen.push({ev:s?s.value:'',c:n?parseInt(n.textContent)||0:0,ft:(t&&t.tagName==='TEXTAREA')?t.value:''});});}const photos=[];if(fr){fr.querySelectorAll('img.foto-thumb').forEach(img=>{if(img.dataset.b64)photos.push(img.dataset.b64);else if(img.src.startsWith('data:'))photos.push(img.src);});}data.rows.push({k:kunde,b:bd?bd.value:'00:00',e:ed?ed.value:'00:00',n:notizen,photos});});return data;}
+
+function saveData(){try{const data=collectData();localStorage.setItem('denis_protokoll',JSON.stringify(data));const now=new Date();const timeStr=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;const bar=document.getElementById('autosaveBar');const txt=document.getElementById('autosaveText');const chip=document.getElementById('chipSave');if(bar)bar.className='autosave-bar no-print';if(txt)txt.textContent=`💾 Automatisch gespeichert um ${timeStr}`;if(chip)chip.textContent=`💾 ${timeStr}`;playBeep('save');}catch(e){const bar=document.getElementById('autosaveBar');const txt=document.getElementById('autosaveText');if(bar)bar.className='autosave-bar error no-print';if(txt)txt.textContent='❌ Speicherfehler – Speicher voll?';showToast('❌ Speicherfehler!','error');}}
+
+function loadData(){try{const saved=localStorage.getItem('denis_protokoll');if(!saved)return false;const data=JSON.parse(saved);if(data.day)document.getElementById('daySelect').value=data.day;if(data.date)document.getElementById('dateInput').value=data.date;if(data.protokollNr)applyProtoNr(data.protokollNr);if(data.mitarbeiter)document.getElementById('mitarbeiterName').value=data.mitarbeiter;if(data.status===false)toggleStatus();if(data.rows&&data.rows.length){data.rows.forEach(r=>addRow(r));return true;}}catch(e){}return false;}
+
+function saveToArchive(){const data=collectData();const key=`denis_archive_${Date.now()}`;try{localStorage.setItem(key,JSON.stringify(data));showToast('📁 Im Archiv gespeichert!','success');playBeep('success');}catch(e){showToast('❌ Archiv voll','error');}}
 function getArchiveKeys(){return Object.keys(localStorage).filter(k=>k.startsWith('denis_archive_')).sort().reverse();}
-function openArchive(){
-  const list=document.getElementById('archiveList');list.innerHTML='';
-  const keys=getArchiveKeys();
-  if(!keys.length){list.innerHTML='<div class="archive-empty">📭 Kein Archiv vorhanden</div>';}
-  keys.forEach(key=>{
-    try{
-      const d=JSON.parse(localStorage.getItem(key));
-      const item=document.createElement('div');item.className='archive-item';
-      const saved=d.savedAt?new Date(d.savedAt).toLocaleString('de-DE'):'—';
-      item.innerHTML=`<div class="archive-item-date">📋 ${d.protokollNr||'—'}</div><div class="archive-item-sub">📅 ${d.day||''} ${d.date||''} · ${d.mitarbeiter||'Anonym'}<br>💾 ${saved} · ${d.rows?.length||0} Zeilen</div>`;
-      item.onclick=()=>{if(confirm('Dieses Protokoll laden?')){loadArchiveItem(key);closeArchive();}};
-      const del=document.createElement('button');del.textContent='🗑';del.style.cssText='float:right;background:none;border:none;cursor:pointer;color:#e44;font-size:12px;';
-      del.onclick=(e)=>{e.stopPropagation();if(confirm('Löschen?')){localStorage.removeItem(key);openArchive();}};
-      item.appendChild(del);list.appendChild(item);
-    }catch(e){}
-  });
-  document.getElementById('archivePanel').classList.add('open');
-  document.getElementById('archiveOverlay').classList.add('open');
-}
+function openArchive(){const list=document.getElementById('archiveList');list.innerHTML='';const keys=getArchiveKeys();if(!keys.length){list.innerHTML='<div class="archive-empty">📭 Kein Archiv vorhanden</div>';}keys.forEach(key=>{try{const d=JSON.parse(localStorage.getItem(key));const item=document.createElement('div');item.className='archive-item';const saved=d.savedAt?new Date(d.savedAt).toLocaleString('de-DE'):'—';item.innerHTML=`<div class="archive-item-date">📋 ${d.protokollNr||'—'}</div><div class="archive-item-sub">📅 ${d.day||''} ${d.date||''} · ${d.mitarbeiter||'Anonym'}<br>💾 ${saved} · ${d.rows?.length||0} Zeilen</div>`;item.onclick=()=>{if(confirm('Dieses Protokoll laden?')){loadArchiveItem(key);closeArchive();}};const del=document.createElement('button');del.textContent='🗑';del.style.cssText='float:right;background:none;border:none;cursor:pointer;color:#e44;font-size:12px;';del.onclick=(e)=>{e.stopPropagation();if(confirm('Löschen?')){localStorage.removeItem(key);openArchive();}};item.appendChild(del);list.appendChild(item);}catch(e){}});document.getElementById('archivePanel').classList.add('open');document.getElementById('archiveOverlay').classList.add('open');}
 function closeArchive(){document.getElementById('archivePanel').classList.remove('open');document.getElementById('archiveOverlay').classList.remove('open');}
-function loadArchiveItem(key){try{const data=JSON.parse(localStorage.getItem(key));localStorage.setItem('denis_protokoll',JSON.stringify(data));location.reload();}catch(e){showToast('❌ Fehler','error');}}
-function exportJSON(){
-  const data=collectData();
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download=`denis-protokoll-${data.date||'export'}.json`;a.click();URL.revokeObjectURL(url);
-  showToast('⬇ JSON exportiert','success');
-}
-async function generatePDF(){
-  const{jsPDF}=window.jspdf,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const data=collectData(),pageW=210,margin=10,contentW=pageW-2*margin;let y=margin;
-  doc.setFillColor(61,82,104);doc.rect(0,0,pageW,28,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text('Denis Protokoll',margin,12);
-  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('Tagesbericht · Vorfallprotokoll',margin,18);
-  doc.setFontSize(9);doc.text(`Nr: ${data.protokollNr||'—'}`,margin,23);doc.text(`Mitarbeiter: ${data.mitarbeiter||'—'}`,90,23);doc.text(`${data.day||''} ${data.date||''}`,155,23);
-  y=33;
-  doc.setFillColor(240,241,244);doc.rect(margin,y,contentW,7,'F');
-  doc.setTextColor(80,80,80);doc.setFontSize(8);doc.setFont('helvetica','bold');
-  doc.text('Kunde',margin+2,y+5);doc.text('Beginn',margin+38,y+5);doc.text('Ende',margin+60,y+5);doc.text('Dienstnotiz',margin+82,y+5);
-  y+=9;doc.setFont('helvetica','normal');doc.setFontSize(9);
-  data.rows.forEach((row,i)=>{
-    if(y>270){doc.addPage();y=margin;}
-    const rowH=Math.max(9,(row.n?.length||0)*6+(row.photos?.length?15:0)+6);
-    if(i%2===0){doc.setFillColor(252,252,252);doc.rect(margin,y,contentW,rowH,'F');}
-    doc.setDrawColor(220,220,220);doc.rect(margin,y,contentW,rowH);
-    doc.setTextColor(20,21,24);doc.setFont('helvetica','bold');
-    doc.text(row.k==='— Standort —'?'':row.k,margin+2,y+5,{maxWidth:34});
-    doc.setFont('helvetica','normal');doc.text(row.b||'',margin+38,y+5);doc.text(row.e||'',margin+60,y+5);
-    let ny=y+4;
-    if(row.n&&row.n.length){row.n.forEach(n=>{if(!n.ev||n.ev==='— Ereignis —')return;doc.setFontSize(7.5);doc.text('• '+(n.c>0?`[${n.c}x] ${n.ev}`:n.ev),margin+82,ny,{maxWidth:contentW-84});ny+=5.5;});}
-    else{doc.setFontSize(8);doc.setTextColor(160,160,160);doc.text('—',margin+82,y+5);}
-    if(row.photos&&row.photos.length){let px=margin+82;row.photos.forEach(b64=>{try{if(px+18>margin+contentW)return;doc.addImage(b64,'JPEG',px,ny,16,13);px+=18;}catch(e){}});if(row.photos.length)ny+=15;}
-    y+=rowH+1;
-  });
-  y+=4;if(y>260){doc.addPage();y=margin;}
-  doc.setFillColor(61,82,104);doc.rect(margin,y,contentW,7,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
-  const rows=document.querySelectorAll('.proto-row');let kC=0,vC=0;
-  rows.forEach(row=>{const sel=row.querySelector('select');if(sel&&sel.value!=='— Standort —')kC++;row.querySelectorAll('.nc-num').forEach(n=>{vC+=parseInt(n.textContent)||0;});});
-  doc.text(`Kunden: ${kC}   Vorfälle: ${vC}   Zeilen: ${data.rows.length}`,margin+2,y+5);
-  y+=11;if(y>245){doc.addPage();y=margin;}
-  doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);
-  doc.line(margin,y+15,margin+85,y+15);doc.line(margin+95,y+15,margin+contentW,y+15);
-  doc.setTextColor(120,120,120);doc.setFontSize(8);doc.setFont('helvetica','normal');
-  doc.text('Mitarbeiter',margin+2,y+19);doc.text('Vorgesetzter',margin+97,y+19);
-  doc.setFontSize(7);doc.setTextColor(180,180,180);
-  doc.text(`Denis Protokoll · Erstellt am ${new Date().toLocaleString('de-DE')}`,margin,292);
-  return doc;
-}
-async function savePdfAndWhatsApp(){
-  showPdfLoader(true);
-  try{
-    const doc=await generatePDF(),data=collectData();
-    doc.save(`denis-protokoll-${data.date||'export'}.pdf`);
-    let text=`🛡 *Denis Protokoll*\n📋 Nr: ${data.protokollNr||'—'}\n👤 ${data.mitarbeiter||'—'}\n📅 ${data.day||''}, ${data.date||''}\n\n`;
-    data.rows.forEach((row,i)=>{const k=row.k==='— Standort —'?'':row.k;if(!k)return;text+=`${i+1}. *${k}* (${row.b||'—'}–${row.e||'—'})\n`;if(row.n)row.n.forEach(n=>{if(n.ev&&n.ev!=='— Ereignis —')text+=`   • ${n.ev}\n`;});});
-    text+=`\n📎 PDF wurde separat heruntergeladen.`;
-    showToast('📄 PDF gespeichert! WhatsApp wird geöffnet…','success');
-    setTimeout(()=>window.open('https://wa.me/?text='+encodeURIComponent(text)),800);
-    saveToArchive();
-  }catch(e){showToast('❌ Fehler: '+e.message,'error');}
-  finally{showPdfLoader(false);}
-}
-function showPdfLoader(show){
-  let o=document.getElementById('pdfLoader');
-  if(show){if(!o){o=document.createElement('div');o.id='pdfLoader';o.className='pdf-loading';o.innerHTML=`<div class="pdf-spinner"></div><div class="pdf-loading-text">PDF wird erstellt…</div>`;document.body.appendChild(o);}}
-  else{if(o)o.remove();}
-}
-function sendWhatsApp(){
-  const data=collectData();
-  let text=`🛡 *Denis Protokoll*\n📋 Nr: ${data.protokollNr||'—'}\n👤 ${data.mitarbeiter||'—'}\n📅 ${data.day||''}, ${data.date||''}\n\n`;
-  data.rows.forEach((row,i)=>{const k=row.k==='— Standort —'?'':row.k;if(!k)return;text+=`${i+1}. *${k}* (${row.b||'—'}–${row.e||'—'})\n`;if(row.n)row.n.forEach(n=>{if(n.ev&&n.ev!=='— Ereignis —')text+=`   • ${n.ev}\n`;});});
-  window.open('https://wa.me/?text='+encodeURIComponent(text));
-}
-function resetForm(){
-  if(!confirm('Alle Einträge zurücksetzen?'))return;
-  localStorage.removeItem('denis_protokoll');document.getElementById('rowsWrap').innerHTML='';
-  rowId=0;Object.keys(nCounts).forEach(k=>delete nCounts[k]);
-  INIT.forEach(d=>addRow(d));applyProtoNr(generateProtoNr(true));
-}
-function updateClock(){
-  const now=new Date(),clock=document.getElementById('liveClock');
-  if(clock)clock.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-  const shiftStart=19*60+45,shiftEnd=7*60,shiftTotal=(24*60-shiftStart)+shiftEnd;
-  const nowMins=now.getHours()*60+now.getMinutes();
-  let elapsed=nowMins>=shiftStart?nowMins-shiftStart:nowMins<=shiftEnd?(24*60-shiftStart)+nowMins:0;
-  const pct=Math.min(100,Math.round((elapsed/shiftTotal)*100));
-  const fill=document.getElementById('progressFill'),pctEl=document.getElementById('progressPct');
-  if(fill)fill.style.width=pct+'%';if(pctEl)pctEl.textContent=pct+'%';
-}
+function loadArchiveItem(key){try{const data=JSON.parse(localStorage.getItem(key));localStorage.setItem('denis_protokoll',JSON.stringify(data));location.reload();}catch(e){showToast('❌ Fehler beim Laden','error');}}
+
+function exportJSON(){const data=collectData();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`denis-protokoll-${data.date||'export'}.json`;a.click();URL.revokeObjectURL(url);showToast('⬇ JSON exportiert','success');}
+
+async function generatePDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});const data=collectData();const pageW=210,margin=10,contentW=pageW-2*margin;let y=margin;doc.setFillColor(61,82,104);doc.rect(0,0,pageW,28,'F');doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text('Denis Protokoll',margin,12);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('Tagesbericht · Vorfallprotokoll',margin,18);doc.setFontSize(9);doc.text(`Nr: ${data.protokollNr||'—'}`,margin,23);doc.text(`Mitarbeiter: ${data.mitarbeiter||'—'}`,90,23);doc.text(`${data.day||''} ${data.date||''}`,155,23);y=33;doc.setFillColor(240,241,244);doc.rect(margin,y,contentW,7,'F');doc.setTextColor(80,80,80);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('Kunde',margin+2,y+5);doc.text('Beginn',margin+38,y+5);doc.text('Ende',margin+60,y+5);doc.text('Dienstnotiz',margin+82,y+5);y+=9;doc.setFont('helvetica','normal');doc.setFontSize(9);data.rows.forEach((row,i)=>{if(y>270){doc.addPage();y=margin;}const rowH=Math.max(9,(row.n?.length||0)*6+6);if(i%2===0){doc.setFillColor(252,252,252);doc.rect(margin,y,contentW,rowH,'F');}doc.setDrawColor(220,220,220);doc.rect(margin,y,contentW,rowH);doc.setTextColor(20,21,24);doc.setFont('helvetica','bold');const kunde=row.k==='— Standort —'?'':row.k;doc.text(kunde,margin+2,y+5,{maxWidth:34});doc.setFont('helvetica','normal');doc.text(row.b||'',margin+38,y+5);doc.text(row.e||'',margin+60,y+5);let ny=y+4;if(row.n&&row.n.length){row.n.forEach(n=>{if(!n.ev||n.ev==='— Ereignis —')return;doc.setFontSize(7.5);doc.text('• '+(n.c>0?`[${n.c}x] ${n.ev}`:n.ev),margin+82,ny,{maxWidth:contentW-84});ny+=5.5;});}else{doc.setFontSize(8);doc.setTextColor(160,160,160);doc.text('—',margin+82,y+5);}y+=rowH+1;});y+=4;if(y>260){doc.addPage();y=margin;}doc.setFillColor(61,82,104);doc.rect(margin,y,contentW,7,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');const rows=document.querySelectorAll('.proto-row');let kC=0,vC=0;rows.forEach(row=>{const sel=row.querySelector('select');if(sel&&sel.value!=='— Standort —')kC++;row.querySelectorAll('.nc-num').forEach(n=>{vC+=parseInt(n.textContent)||0;});});doc.text(`Kunden: ${kC}   Vorfälle: ${vC}   Zeilen: ${data.rows.length}`,margin+2,y+5);y+=11;if(y>245){doc.addPage();y=margin;}doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(margin,y+15,margin+85,y+15);doc.line(margin+95,y+15,margin+contentW,y+15);doc.setTextColor(120,120,120);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('Mitarbeiter',margin+2,y+19);doc.text('Vorgesetzter',margin+97,y+19);doc.setFontSize(7);doc.setTextColor(180,180,180);doc.text(`Denis Protokoll · Erstellt am ${new Date().toLocaleString('de-DE')}`,margin,292);return doc;}
+
+async function savePdfAndWhatsApp(){showPdfLoader(true);try{const doc=await generatePDF();const data=collectData();doc.save(`denis-protokoll-${data.date||'export'}.pdf`);let text=`🛡 *Denis Protokoll*\n📋 Nr: ${data.protokollNr||'—'}\n👤 ${data.mitarbeiter||'—'}\n📅 ${data.day||''}, ${data.date||''}\n\n`;data.rows.forEach((row,i)=>{const kunde=row.k==='— Standort —'?'':row.k;if(!kunde)return;text+=`${i+1}. *${kunde}* (${row.b||'—'}–${row.e||'—'})\n`;if(row.n)row.n.forEach(n=>{if(n.ev&&n.ev!=='— Ereignis —')text+=`   • ${n.ev}\n`;});});text+=`\n📎 PDF wurde separat heruntergeladen.`;showToast('📄 PDF gespeichert! WhatsApp wird geöffnet…','success');setTimeout(()=>{window.open('https://wa.me/?text='+encodeURIComponent(text));},800);saveToArchive();}catch(e){showToast('❌ Fehler: '+e.message,'error');}finally{showPdfLoader(false);}}
+
+function showPdfLoader(show){let overlay=document.getElementById('pdfLoader');if(show){if(!overlay){overlay=document.createElement('div');overlay.id='pdfLoader';overlay.className='pdf-loading';overlay.innerHTML=`<div class="pdf-spinner"></div><div class="pdf-loading-text">PDF wird erstellt…</div>`;document.body.appendChild(overlay);}}else{if(overlay)overlay.remove();}}
+
+function sendWhatsApp(){const data=collectData();let text=`🛡 *Denis Protokoll*\n📋 Nr: ${data.protokollNr||'—'}\n👤 ${data.mitarbeiter||'—'}\n📅 ${data.day||''}, ${data.date||''}\n\n`;data.rows.forEach((row,i)=>{const kunde=row.k==='— Standort —'?'':row.k;if(!kunde)return;text+=`${i+1}. *${kunde}* (${row.b||'—'}–${row.e||'—'})\n`;if(row.n)row.n.forEach(n=>{if(n.ev&&n.ev!=='— Ereignis —')text+=`   • ${n.ev}\n`;});});window.open('https://wa.me/?text='+encodeURIComponent(text));}
+
+function resetForm(){if(!confirm('Alle Einträge zurücksetzen?'))return;localStorage.removeItem('denis_protokoll');document.getElementById('rowsWrap').innerHTML='';rowId=0;Object.keys(nCounts).forEach(k=>delete nCounts[k]);INIT.forEach(d=>addRow(d));applyProtoNr(generateProtoNr(true));}
+
+function updateClock(){const now=new Date();const clock=document.getElementById('liveClock');if(clock)clock.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;const shiftStart=19*60+45,shiftEnd=7*60,shiftTotal=(24*60-shiftStart)+shiftEnd;const nowMins=now.getHours()*60+now.getMinutes();let elapsed=nowMins>=shiftStart?nowMins-shiftStart:nowMins<=shiftEnd?(24*60-shiftStart)+nowMins:0;const pct=Math.min(100,Math.round((elapsed/shiftTotal)*100));const fill=document.getElementById('progressFill');const pctEl=document.getElementById('progressPct');if(fill)fill.style.width=pct+'%';if(pctEl)pctEl.textContent=pct+'%';}
+
 document.addEventListener('input',()=>scheduleSave());
 document.addEventListener('change',()=>scheduleSave());
 setInterval(saveData,30000);
 setInterval(saveToArchive,5*60*1000);
-updateClock();setInterval(updateClock,1000);
+updateClock();
+setInterval(updateClock,1000);
+
 const loaded=loadData();
 if(!loaded){INIT.forEach(d=>addRow(d));applyProtoNr(generateProtoNr(false));}
-else if(!currentProtoNr)applyProtoNr(generateProtoNr(false));
+else if(!currentProtoNr){applyProtoNr(generateProtoNr(false));}
 document.querySelectorAll('.time-input-direct').forEach(colorTime);
 document.querySelectorAll('.notiz-select').forEach(updateNotizSelectStyle);
+
+// ══════════════════════════════════════════
+// 🤖 KI-ASSISTENT
+// ══════════════════════════════════════════
+let aiCurrentTab='voice',aiTargetRowId=null,mediaRecorder=null,audioChunks=[],isRecording=false,aiPhotoBase64=null;
+
+function openAiModal(rowId){aiTargetRowId=rowId||null;const sel=document.getElementById('aiRowSelect');sel.innerHTML='<option value="">— Zeile auswählen (optional) —</option>';document.querySelectorAll('.proto-row').forEach(row=>{const id=row.id.replace('row-','');const ksel=document.getElementById(`ksel-${id}`);const kcust=document.getElementById(`kcust-${id}`);const isCustom=kcust&&kcust.style.display!=='none';const kunde=isCustom?kcust.value:(ksel?ksel.value:'');if(kunde&&kunde!=='— Standort —'){const opt=document.createElement('option');opt.value=id;opt.textContent=`#${id.padStart(2,'0')} – ${kunde}`;if(String(rowId)===String(id))opt.selected=true;sel.appendChild(opt);}});if(rowId)sel.value=rowId;document.getElementById('aiModalOverlay').style.display='flex';resetAiResults();}
+
+function closeAiModal(e){if(e&&e.target!==document.getElementById('aiModalOverlay'))return;document.getElementById('aiModalOverlay').style.display='none';stopRecording();aiPhotoBase64=null;document.getElementById('aiPhotoPreview').style.display='none';document.getElementById('aiPhotoPreview').src='';document.getElementById('photoAnalyzeBtn').style.display='none';document.getElementById('aiPhotoInput').value='';resetAiResults();}
+
+function resetAiResults(){['voiceAiResult','describeAiResult','photoAiResult'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('visible');el.innerHTML='';}});const vr=document.getElementById('voiceResult');if(vr){vr.style.display='none';vr.textContent='';}const vab=document.getElementById('voiceAnalyzeBtn');if(vab)vab.style.display='none';}
+
+function switchAiTab(tab,btn){aiCurrentTab=tab;document.querySelectorAll('.ai-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');['voice','describe','photo'].forEach(t=>{const el=document.getElementById(`aiTab-${t}`);if(el)el.style.display=t===tab?'block':'none';});resetAiResults();}
+
+function applyAiToRow(ereignis,freitext){const sel=document.getElementById('aiRowSelect');const rowId=sel.value||aiTargetRowId;if(!rowId){showToast('⚠️ Bitte zuerst eine Zeile auswählen','error');return;}const match=EREIGNISSE_GROUPS.find(g=>!g.disabled&&g.label.toLowerCase().includes(ereignis.toLowerCase().substring(0,15)));const finalEvent=match?match.label:'Freitext…';addNotiz(parseInt(rowId),finalEvent,1,freitext||ereignis);showToast('✅ KI-Ergebnis in Zeile eingetragen!','success');playBeep('success');document.getElementById('aiModalOverlay').style.display='none';}
+
+async function toggleRecording(){if(isRecording){stopRecording();return;}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);audioChunks=[];mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);mediaRecorder.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(audioChunks,{type:'audio/webm'});await transcribeAudio(blob);};mediaRecorder.start();isRecording=true;document.getElementById('voiceBtn').classList.add('recording');document.getElementById('voiceBtn').textContent='⏹';document.getElementById('voiceStatus').textContent='🔴 Aufnahme läuft…';}catch(e){useSpeechRecognition();}}
+
+function stopRecording(){if(mediaRecorder&&isRecording)mediaRecorder.stop();isRecording=false;document.getElementById('voiceBtn').classList.remove('recording');document.getElementById('voiceBtn').textContent='🎙';document.getElementById('voiceStatus').textContent='Tippen zum Starten';}
+
+function useSpeechRecognition(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('❌ Mikrofon nicht verfügbar','error');return;}const recognition=new SR();recognition.lang='de-DE';recognition.interimResults=false;recognition.maxAlternatives=1;isRecording=true;document.getElementById('voiceBtn').classList.add('recording');document.getElementById('voiceBtn').textContent='⏹';document.getElementById('voiceStatus').textContent='🔴 Sprechen Sie jetzt…';recognition.start();recognition.onresult=(e)=>{const text=e.results[0][0].transcript;const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🗣 '+text;document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text=text;isRecording=false;document.getElementById('voiceBtn').classList.remove('recording');document.getElementById('voiceBtn').textContent='🎙';document.getElementById('voiceStatus').textContent='Fertig! Analysieren drücken';};recognition.onerror=()=>{showToast('❌ Spracherkennung fehlgeschlagen','error');stopRecording();};}
+
+async function transcribeAudio(blob){const reader=new FileReader();reader.onload=async(e)=>{document.getElementById('voiceStatus').textContent='⏳ Wird transkribiert…';const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🎙 Audio aufgenommen – wird analysiert…';document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text='Audio analysieren';document.getElementById('voiceStatus').textContent='Fertig! Analysieren drücken';};reader.readAsDataURL(blob);}
+
+async function analyzeVoiceText(){const btn=document.getElementById('voiceAnalyzeBtn');const text=btn.dataset.text||document.getElementById('voiceResult').textContent.replace('🗣 ','');await callClaudeForIncident(text,'voiceAiResult',btn);}
+
+async function analyzeDescribeText(){const text=document.getElementById('aiDescribeText').value.trim();if(!text){showToast('⚠️ Bitte Vorfall beschreiben','error');return;}await callClaudeForIncident(text,'describeAiResult',document.getElementById('describeBtn'));}
+
+function handleAiPhoto(input){if(!input.files[0])return;compressImage(input.files[0],1024,768,0.75,(b64)=>{aiPhotoBase64=b64;const preview=document.getElementById('aiPhotoPreview');preview.src=b64;preview.style.display='block';const btn=document.getElementById('photoAnalyzeBtn');btn.style.display='block';btn.disabled=false;btn.style.opacity='1';});}
+
+function openAiPhotoFromRow(rowId,input){openAiModal(rowId);const photoTabBtn=document.querySelector('.ai-tab:nth-child(3)');if(photoTabBtn)switchAiTab('photo',photoTabBtn);if(input.files[0])handleAiPhoto(input);}
+
+async function analyzePhoto(){if(!aiPhotoBase64){showToast('⚠️ Bitte zuerst ein Foto hochladen','error');return;}await callClaudeForIncidentPhoto(aiPhotoBase64,'photoAiResult',document.getElementById('photoAnalyzeBtn'));}
+
+async function callClaudeForIncident(text,resultBoxId,btn){
+  const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere…';btn.disabled=true;
+  const eventList=EREIGNISSE_GROUPS.filter(g=>!g.disabled&&g.label!=='Freitext…').map(g=>g.label).join(', ');
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Du bist ein Assistent für einen Sicherheitsdienst-Mitarbeiter. Analysiere die folgende Beschreibung eines Vorfalls und gib eine strukturierte Antwort auf Deutsch zurück.\n\nVerfügbare Ereignistypen: ${eventList}\n\nVorfall-Beschreibung: "${text}"\n\nAntworte NUR im folgenden JSON-Format ohne Markdown-Backticks:\n{\n  "ereignis": "Am besten passender Ereignistyp aus der Liste oben",\n  "zusammenfassung": "Kurze professionelle Zusammenfassung des Vorfalls in 1-2 Sätzen",\n  "empfehlung": "Kurze Empfehlung für den Mitarbeiter",\n  "schwere": "niedrig|mittel|hoch"\n}`}]})});
+    const data=await response.json();const raw=data.content?.[0]?.text||'';let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){parsed={ereignis:'Freitext…',zusammenfassung:raw,empfehlung:'—',schwere:'niedrig'};}
+    const sc=parsed.schwere==='hoch'?'#b71c1c':parsed.schwere==='mittel'?'#7a4800':'#1a6630';
+    const se=parsed.schwere==='hoch'?'🚨':parsed.schwere==='mittel'?'⚠️':'✅';
+    const rb=document.getElementById(resultBoxId);
+    rb.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px;">🤖 KI-Analyse</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${parsed.schwere?.toUpperCase()}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Ereignis:</span><br><span style="font-size:12px;">${parsed.ereignis}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📝 Zusammenfassung:</span><br><span style="font-size:12px;">${parsed.zusammenfassung}</span></div><div style="margin-bottom:10px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">💡 Empfehlung:</span><br><span style="font-size:12px;">${parsed.empfehlung}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${parsed.ereignis.replace(/'/g,"\\'")}','${parsed.zusammenfassung.replace(/'/g,"\\'")}')">✅ In Zeile eintragen</button>`;
+    rb.classList.add('visible');playBeep('success');
+  }catch(e){showToast('❌ KI-Fehler: '+e.message,'error');}
+  finally{btn.innerHTML=orig;btn.disabled=false;}
+}
+
+async function callClaudeForIncidentPhoto(b64,resultBoxId,btn){
+  const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere Foto…';btn.disabled=true;
+  const eventList=EREIGNISSE_GROUPS.filter(g=>!g.disabled&&g.label!=='Freitext…').map(g=>g.label).join(', ');
+  const mediaType=b64.startsWith('data:image/png')?'image/png':'image/jpeg';
+  const imageData=b64.split(',')[1];
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mediaType,data:imageData}},{type:'text',text:`Du bist ein Sicherheitsdienst-Assistent. Analysiere dieses Foto und erstelle einen professionellen Bericht.\n\nVerfügbare Ereignistypen: ${eventList}\n\nAntworte NUR im folgenden JSON-Format ohne Markdown-Backticks:\n{\n  "ereignis": "Am besten passender Ereignistyp aus der Liste",\n  "zusammenfassung": "Professionelle Beschreibung dessen was auf dem Foto zu sehen ist in 2-3 Sätzen",\n  "empfehlung": "Empfehlung für den Sicherheitsdienst",\n  "schwere": "niedrig|mittel|hoch"\n}`}]}]})});
+    const data=await response.json();const raw=data.content?.[0]?.text||'';let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){parsed={ereignis:'Freitext…',zusammenfassung:raw,empfehlung:'—',schwere:'niedrig'};}
+    const sc=parsed.schwere==='hoch'?'#b71c1c':parsed.schwere==='mittel'?'#7a4800':'#1a6630';
+    const se=parsed.schwere==='hoch'?'🚨':parsed.schwere==='mittel'?'⚠️':'✅';
+    const rb=document.getElementById(resultBoxId);
+    rb.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px;">📸 Foto-Analyse</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${parsed.schwere?.toUpperCase()}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Erkanntes Ereignis:</span><br><span style="font-size:12px;">${parsed.ereignis}</span></div><div style="margin-bottom:6px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📝 Beschreibung:</span><br><span style="font-size:12px;">${parsed.zusammenfassung}</span></div><div style="margin-bottom:10px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">💡 Empfehlung:</span><br><span style="font-size:12px;">${parsed.empfehlung}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${parsed.ereignis.replace(/'/g,"\\'")}','${parsed.zusammenfassung.replace(/'/g,"\\'")}')">✅ In Zeile eintragen</button>`;
+    rb.classList.add('visible');playBeep('success');
+  }catch(e){showToast('❌ Foto-Analyse Fehler: '+e.message,'error');}
+  finally{btn.innerHTML=orig;btn.disabled=false;}
+}
 </script>
 </body>
 </html>
