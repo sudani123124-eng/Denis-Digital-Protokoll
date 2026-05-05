@@ -198,6 +198,9 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
 .ai-spinner { display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px; }
 .ai-tiny-btn { font-size:9px;font-weight:700;color:#7c3aed;background:none;border:1.5px dashed #c4b5fd;border-radius:6px;padding:2px 7px;cursor:pointer;transition:all 0.15s;white-space:nowrap; }
 .ai-tiny-btn:hover { background:#f5f3ff;border-color:#7c3aed; }
+/* AI Model Status Badge */
+.ai-model-badge { display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:20px;padding:3px 9px;font-size:9px;font-weight:700;color:#7c3aed;margin-bottom:10px; }
+.ai-model-dot { width:5px;height:5px;border-radius:50%;background:#7c3aed;animation:pulse 2s infinite; }
 .archive-btn { position: fixed; left: 12px; bottom: 54px; z-index: 998; background: #3d5268; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 16px; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.25); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
 .archive-btn:hover { transform: scale(1.1); }
 .archive-panel { position: fixed; left: 0; top: 0; bottom: 0; width: 300px; background: var(--card); box-shadow: 4px 0 24px rgba(0,0,0,0.18); z-index: 9990; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
@@ -340,6 +343,11 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
     <div class="ai-modal-handle"></div>
     <div class="ai-modal-title">🤖 <span>KI-Assistent</span></div>
     <div class="ai-modal-sub">Sprache · Beschreibung · Foto-Analyse</div>
+    <!-- AI Model Status -->
+    <div class="ai-model-badge no-print">
+      <span class="ai-model-dot"></span>
+      <span id="aiModelLabel">🧠 Lade KI-Modell…</span>
+    </div>
     <select class="ai-row-select" id="aiRowSelect"><option value="">— Zeile auswählen (optional) —</option></select>
     <div class="ai-tabs">
       <button class="ai-tab active" onclick="switchAiTab('voice',this)">🎙 Sprache</button>
@@ -390,7 +398,184 @@ body.dark-mode .ai-action-btn.secondary { background:#3a3a3a;color:var(--text); 
     <button class="as-btn" onclick="saveToArchive()">💾 Jetzt speichern</button>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Transformers.js – läuft komplett im Browser, kein API-Key  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+// ── Transformers.js from CDN (free, no API key, runs in browser) ──
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/dist/transformers.min.js';
+
+// Use cached models (no server required)
+env.allowLocalModels = false;
+env.useBrowserCache  = true;
+
+const MODEL_LABEL_EL = document.getElementById('aiModelLabel');
+let imageClassifier = null;
+let modelLoading = false;
+let modelReady = false;
+
+// ── Map English CLIP/ViT labels → German Protokoll events ──
+const LABEL_TO_EREIGNIS = [
+  // Violence / Emergency
+  { en: ['fight','violence','assault','punch','kick','attack'],        de: 'Streit geschlichtet',                               s: 'hoch' },
+  { en: ['police','cop','officer','law enforcement'],                  de: 'Polizei eingetroffen – Personalien aufgenommen 🚨',  s: 'hoch' },
+  { en: ['ambulance','paramedic','stretcher','medical','first aid'],   de: 'Rettungsdienst angefordert 🚑',                     s: 'hoch' },
+  { en: ['fire','flame','smoke','burning'],                            de: 'Notruf / Notfall gemeldet 🚨',                      s: 'hoch' },
+  { en: ['vandalism','graffiti','spray paint','tagging'],              de: 'Vandalismus gemeldet – Polizei informiert 🚨',      s: 'hoch' },
+  { en: ['theft','steal','shoplifting','pickpocket'],                  de: 'Diebstahl gemeldet – Polizei verständigt 🚨',       s: 'hoch' },
+  { en: ['flood','water leak','pipe burst','flooding'],                de: 'Rohrbruch / Wasseraustritt 💧',                     s: 'hoch' },
+  // Property damage
+  { en: ['broken glass','shattered','broken window','broken door'],    de: 'Defekte Tür / Fenster 🚪',                         s: 'mittel' },
+  { en: ['damage','dent','scratch','crash','collision','accident'],    de: 'Fahrzeugschaden festgestellt',                      s: 'mittel' },
+  { en: ['debris','rubble','wreck','destruction'],                     de: 'Sachschaden festgestellt – Dokumentiert',           s: 'mittel' },
+  // Parking / Traffic
+  { en: ['car','vehicle','automobile','parking','parked'],             de: 'Parkverstoß dokumentiert',                         s: 'niedrig' },
+  { en: ['tow truck','towing','impound'],                              de: 'Fahrzeug unberechtigt geparkt – Abschlepper verständigt', s: 'mittel' },
+  // Persons
+  { en: ['homeless','beggar','sleeping rough','vagrant'],              de: 'Obdachlose nach draußen gebracht',                 s: 'niedrig' },
+  { en: ['crowd','trespassing','unauthorized','intruder'],             de: 'Unbefugte Person entfernt',                        s: 'mittel' },
+  { en: ['argument','dispute','shouting','confrontation'],             de: 'Ruhestörung – Personen verwiesen',                 s: 'mittel' },
+  // Technical
+  { en: ['broken light','dark','no light','darkness','dim'],          de: 'Defekte Beleuchtung 💡',                           s: 'niedrig' },
+  { en: ['barrier','gate','boom gate','boom arm'],                     de: 'Schrankenstörung 🚧',                              s: 'mittel' },
+  { en: ['electrical','circuit','fuse','power outage','blackout'],    de: 'Sicherungsausfall ⚡',                              s: 'hoch' },
+  { en: ['machine','equipment','device','broken machine','malfunction'],de:'Technischer Defekt gemeldet 🔧',                  s: 'niedrig' },
+];
+
+// German label keywords for direct text-based matching on image classifier output
+function mapLabelToEreignis(labelText) {
+  const lower = labelText.toLowerCase();
+  for (const entry of LABEL_TO_EREIGNIS) {
+    if (entry.en.some(kw => lower.includes(kw))) {
+      return { ereignis: entry.de, schwere: entry.s };
+    }
+  }
+  return null;
+}
+
+async function loadModel() {
+  if (modelReady || modelLoading) return;
+  modelLoading = true;
+  if (MODEL_LABEL_EL) MODEL_LABEL_EL.textContent = '⏳ Lade KI-Modell (einmalig)…';
+  try {
+    // Use zero-shot image classification with CLIP – works in browser with Transformers.js
+    // Model: Xenova/clip-vit-base-patch32 – ~350 MB, cached after first load
+    imageClassifier = await pipeline(
+      'zero-shot-image-classification',
+      'Xenova/clip-vit-base-patch32',
+      { progress_callback: (p) => {
+          if (MODEL_LABEL_EL && p.progress) {
+            MODEL_LABEL_EL.textContent = `⏳ Lade Modell ${Math.round(p.progress)}%…`;
+          }
+        }
+      }
+    );
+    modelReady = true;
+    modelLoading = false;
+    if (MODEL_LABEL_EL) MODEL_LABEL_EL.textContent = '✅ KI bereit (CLIP · Browser-lokal)';
+    if (typeof showToast === 'function') showToast('✅ KI-Modell geladen!', 'success');
+  } catch(e) {
+    modelLoading = false;
+    if (MODEL_LABEL_EL) MODEL_LABEL_EL.textContent = '⚠️ Modell nicht verfügbar (Offline?)';
+    console.warn('Transformers.js load error:', e);
+  }
+}
+
+// Candidate labels (English) – CLIP compares image against all of these
+const CANDIDATE_LABELS = [
+  'fight or violence','police officer','ambulance or paramedic',
+  'fire or smoke','vandalism or graffiti','theft or stealing',
+  'water leak or flood','broken glass or broken window',
+  'car damage or accident','homeless person sleeping',
+  'unauthorized person','parking violation',
+  'tow truck','broken light or darkness',
+  'barrier or gate malfunction','electrical failure',
+  'debris or property damage','crowd disturbance'
+];
+
+// Expose to global scope for the non-module script below
+window.__transformersAnalyzePhoto = async function(b64, resultBoxId, btn) {
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="ai-spinner"></span>KI analysiert Foto…';
+  btn.disabled = true;
+
+  try {
+    // Load model on first use
+    if (!modelReady) {
+      await loadModel();
+    }
+
+    if (!modelReady || !imageClassifier) {
+      throw new Error('Modell nicht verfügbar');
+    }
+
+    if (MODEL_LABEL_EL) MODEL_LABEL_EL.textContent = '🔍 Analysiere Bild…';
+
+    // Run zero-shot image classification
+    const results = await imageClassifier(b64, CANDIDATE_LABELS, { topk: 3 });
+
+    if (MODEL_LABEL_EL) MODEL_LABEL_EL.textContent = '✅ KI bereit (CLIP · Browser-lokal)';
+
+    // results = [{label, score}, ...]
+    const top = results[0];
+    const mapped = mapLabelToEreignis(top.label);
+    const confidence = Math.round(top.score * 100);
+
+    let ereignis, schwere;
+    if (mapped && top.score > 0.12) {
+      ereignis = mapped.ereignis;
+      schwere   = mapped.schwere;
+    } else {
+      // fallback to second best
+      const second = results[1] ? mapLabelToEreignis(results[1].label) : null;
+      if (second && results[1].score > 0.10) {
+        ereignis = second.ereignis;
+        schwere   = second.schwere;
+      } else {
+        ereignis = 'Sachschaden festgestellt – Dokumentiert';
+        schwere   = 'mittel';
+      }
+    }
+
+    const rb = document.getElementById(resultBoxId);
+    if (rb && typeof window.buildResultHTML === 'function') {
+      // Show confidence sub-info
+      const confInfo = `<div style="margin-top:8px;font-size:10px;color:#7c3aed;opacity:0.8;">🧠 KI-Konfidenz: ${confidence}% · Erkannt: „${top.label}"</div>`;
+      rb.innerHTML = window.buildResultHTML('📸 KI-Foto-Analyse (Transformers.js)', ereignis, '', '', schwere) + confInfo;
+      rb.classList.add('visible');
+    }
+    if (typeof playBeep === 'function') playBeep('success');
+    if (typeof showToast === 'function') showToast(`✅ Erkannt: ${ereignis}`, 'success');
+
+  } catch(err) {
+    console.error('Photo analysis error:', err);
+    // If model fails, show clear error — NO pixel fallback
+    const rb = document.getElementById(resultBoxId);
+    if (rb) {
+      rb.innerHTML = `<div style="text-align:center;padding:10px;">
+        <div style="font-size:24px;margin-bottom:8px;">⚠️</div>
+        <div style="font-weight:700;color:#b71c1c;margin-bottom:4px;">KI-Modell nicht verfügbar</div>
+        <div style="font-size:10px;color:#888;">Bitte Internetverbindung prüfen oder Beschreibungs-Tab nutzen.</div>
+        <div style="font-size:9px;color:#aaa;margin-top:6px;">${err.message}</div>
+      </div>`;
+      rb.classList.add('visible');
+    }
+    if (typeof showToast === 'function') showToast('⚠️ KI-Modell nicht verfügbar', 'error');
+  } finally {
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+};
+
+// Pre-load model in background after page loads
+setTimeout(loadModel, 2000);
+</script>
+
 <script>
+// ══════════════════════════════════════════════════════════════
+// HAUPTSKRIPT (identisch mit Original – nur Foto-Analyse ersetzt)
+// ══════════════════════════════════════════════════════════════
 const KUNDEN=['— Standort —','Galerie','Lüneburg Parkhaus','Fuhle','Parking Millerntorplatz','Parkhaus My Falkenried'];
 const EREIGNISSE_GROUPS=[
   {label:'── Regulär ──',disabled:true},
@@ -528,16 +713,57 @@ function closeAiModal(e){if(e&&e.target!==document.getElementById('aiModalOverla
 function resetAiResults(){['voiceAiResult','describeAiResult','photoAiResult'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('visible');el.innerHTML='';}});const vr=document.getElementById('voiceResult');if(vr){vr.style.display='none';vr.textContent='';}const vab=document.getElementById('voiceAnalyzeBtn');if(vab)vab.style.display='none';}
 function switchAiTab(tab,btn){aiCurrentTab=tab;document.querySelectorAll('.ai-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');['voice','describe','photo'].forEach(t=>{const el=document.getElementById(`aiTab-${t}`);if(el)el.style.display=t===tab?'block':'none';});resetAiResults();}
 function applyAiToRow(ereignis,freitext){const sel=document.getElementById('aiRowSelect');const rowId=sel.value||aiTargetRowId;if(!rowId){showToast('⚠️ Bitte zuerst eine Zeile auswählen','error');return;}const match=EREIGNISSE_GROUPS.find(g=>!g.disabled&&g.label.toLowerCase().includes(ereignis.toLowerCase().substring(0,15)));const finalEvent=match?match.label:'Freitext…';addNotiz(parseInt(rowId),finalEvent,1,freitext||ereignis);showToast('✅ KI-Ergebnis in Zeile eingetragen!','success');playBeep('success');document.getElementById('aiModalOverlay').style.display='none';}
+
+// ── Expose buildResultHTML to module scope ──
+window.buildResultHTML = function(title,ereignis,zusammenfassung,empfehlung,schwere){
+  const sc=schwere==='hoch'?'#b71c1c':schwere==='mittel'?'#7a4800':'#1a6630';
+  const se=schwere==='hoch'?'🚨':schwere==='mittel'?'⚠️':'✅';
+  const safe=s=>s.replace(/'/g,"\'");
+  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><strong style="font-size:13px;">${title}</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${schwere.toUpperCase()}</span></div><div style="margin-bottom:12px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Ereignis:</span><br><span style="font-size:13px;font-weight:700;color:#1a1a1a;">${ereignis}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${safe(ereignis)}','${safe(ereignis)}')">✅ In Zeile eintragen</button>`;
+};
+// local alias
+function buildResultHTML(t,e,z,r,s){return window.buildResultHTML(t,e,z,r,s);}
+
 async function toggleRecording(){if(isRecording){stopRecording();return;}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);audioChunks=[];mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);mediaRecorder.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(audioChunks,{type:'audio/webm'});await transcribeAudio(blob);};mediaRecorder.start();isRecording=true;document.getElementById('voiceBtn').classList.add('recording');document.getElementById('voiceBtn').textContent='⏹';document.getElementById('voiceStatus').textContent='🔴 Aufnahme läuft…';}catch(e){useSpeechRecognition();}}
 function stopRecording(){if(mediaRecorder&&isRecording)mediaRecorder.stop();isRecording=false;document.getElementById('voiceBtn').classList.remove('recording');document.getElementById('voiceBtn').textContent='🎙';document.getElementById('voiceStatus').textContent='Tippen zum Starten';}
 function useSpeechRecognition(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('❌ Mikrofon nicht verfügbar','error');return;}const recognition=new SR();recognition.lang='de-DE';recognition.interimResults=false;recognition.maxAlternatives=1;isRecording=true;document.getElementById('voiceBtn').classList.add('recording');document.getElementById('voiceBtn').textContent='⏹';document.getElementById('voiceStatus').textContent='🔴 Sprechen Sie jetzt…';recognition.start();recognition.onresult=(e)=>{const text=e.results[0][0].transcript;const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🗣 '+text;document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text=text;isRecording=false;document.getElementById('voiceBtn').classList.remove('recording');document.getElementById('voiceBtn').textContent='🎙';document.getElementById('voiceStatus').textContent='Fertig! Analysieren drücken';};recognition.onerror=()=>{showToast('❌ Spracherkennung fehlgeschlagen','error');stopRecording();};}
 async function transcribeAudio(blob){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){useSpeechRecognition();return;}const vr=document.getElementById('voiceResult');vr.style.display='block';vr.textContent='🎙 Sprache erkannt – Analysieren drücken';document.getElementById('voiceAnalyzeBtn').style.display='block';document.getElementById('voiceAnalyzeBtn').dataset.text='Vorfall analysieren';document.getElementById('voiceStatus').textContent='Fertig!';}
 async function analyzeVoiceText(){const btn=document.getElementById('voiceAnalyzeBtn');const raw=document.getElementById('voiceResult').textContent.replace('🗣 ','').trim();const text=btn.dataset.text&&btn.dataset.text!=='Audio analysieren'?btn.dataset.text:raw;if(!text||text==='Vorfall analysieren'){showToast('⚠️ Bitte zuerst sprechen','error');return;}analyzeTextLocally(text,'voiceAiResult',btn);}
 async function analyzeDescribeText(){const text=document.getElementById('aiDescribeText').value.trim();if(!text){showToast('⚠️ Bitte Vorfall beschreiben','error');return;}analyzeTextLocally(text,'describeAiResult',document.getElementById('describeBtn'));}
+
 function handleAiPhoto(input){if(!input.files[0])return;compressImage(input.files[0],1024,768,0.75,(b64)=>{aiPhotoBase64=b64;const preview=document.getElementById('aiPhotoPreview');preview.src=b64;preview.style.display='block';const btn=document.getElementById('photoAnalyzeBtn');btn.style.display='block';btn.disabled=false;btn.style.opacity='1';});}
 function openAiPhotoFromRow(rowId,input){openAiModal(rowId);const photoTabBtn=document.querySelector('.ai-tab:nth-child(3)');if(photoTabBtn)switchAiTab('photo',photoTabBtn);if(input.files[0])handleAiPhoto(input);}
-async function analyzePhoto(){if(!aiPhotoBase64){showToast('⚠️ Bitte zuerst ein Foto hochladen','error');return;}await analyzePhotoLocally(aiPhotoBase64,'photoAiResult',document.getElementById('photoAnalyzeBtn'));}
 
+// ── FOTO ANALYSIEREN: Transformers.js (lokal im Browser) ──
+async function analyzePhoto(){
+  if(!aiPhotoBase64){showToast('⚠️ Bitte zuerst ein Foto hochladen','error');return;}
+  const btn=document.getElementById('photoAnalyzeBtn');
+  // Delegate to the ES module function
+  if(typeof window.__transformersAnalyzePhoto==='function'){
+    await window.__transformersAnalyzePhoto(aiPhotoBase64,'photoAiResult',btn);
+  } else {
+    // Module not loaded yet
+    btn.innerHTML='<span class="ai-spinner"></span>Lade KI-Modell…';
+    btn.disabled=true;
+    let waited=0;
+    const interval=setInterval(()=>{
+      waited+=300;
+      if(typeof window.__transformersAnalyzePhoto==='function'){
+        clearInterval(interval);
+        btn.innerHTML='🤖 Foto analysieren';
+        btn.disabled=false;
+        window.__transformersAnalyzePhoto(aiPhotoBase64,'photoAiResult',btn);
+      } else if(waited>15000){
+        clearInterval(interval);
+        btn.innerHTML='🤖 Foto analysieren';
+        btn.disabled=false;
+        showToast('⚠️ KI-Modell konnte nicht geladen werden','error');
+      }
+    },300);
+  }
+}
+
+// ── Text-Analyse (Keyword-Matching, bleibt wie original) ──
 const KEYWORD_MAP=[
   {keys:['obdachlos','بدون مأوى','تشرد','raus','draußen','homeless'],ev:'Obdachlose nach draußen gebracht',schwere:'niedrig'},
   {keys:['herausgelassen','schranke auf','fahrzeug raus','سيارة خرجت'],ev:'Fahrzeuge herausgelassen',schwere:'niedrig'},
@@ -563,102 +789,7 @@ const KEYWORD_MAP=[
   {keys:['abschlepper','abschleppen','رافعة سيارات'],ev:'Fahrzeug unberechtigt geparkt – Abschlepper verständigt',schwere:'mittel'},
 ];
 function matchEvent(text){const lower=text.toLowerCase();let bestMatch=null,bestScore=0;for(const entry of KEYWORD_MAP){let score=0;for(const kw of entry.keys){if(lower.includes(kw.toLowerCase()))score+=kw.length;}if(score>bestScore){bestScore=score;bestMatch=entry;}}return bestMatch;}
-
-function buildResultHTML(title,ereignis,zusammenfassung,empfehlung,schwere){
-  const sc=schwere==='hoch'?'#b71c1c':schwere==='mittel'?'#7a4800':'#1a6630';
-  const se=schwere==='hoch'?'🚨':schwere==='mittel'?'⚠️':'✅';
-  const safe=s=>s.replace(/'/g,"\'");
-  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><strong style="font-size:13px;">${title}</strong><span style="font-size:10px;font-weight:700;color:${sc};background:${sc}20;padding:2px 8px;border-radius:10px;">${se} ${schwere.toUpperCase()}</span></div><div style="margin-bottom:12px;"><span style="font-weight:700;font-size:11px;color:#6d28d9;">📋 Ereignis:</span><br><span style="font-size:13px;font-weight:700;color:#1a1a1a;">${ereignis}</span></div><button class="ai-action-btn primary" style="width:100%;" onclick="applyAiToRow('${safe(ereignis)}','${safe(ereignis)}')">✅ In Zeile eintragen</button>`;
-}
-
 function analyzeTextLocally(text,resultBoxId,btn){const orig=btn.innerHTML;btn.innerHTML='<span class="ai-spinner"></span>Analysiere…';btn.disabled=true;setTimeout(()=>{const match=matchEvent(text);const ereignis=match?match.ev:'Freitext…';const schwere=match?match.schwere:'niedrig';const rb=document.getElementById(resultBoxId);rb.innerHTML=buildResultHTML('🤖 KI-Analyse',ereignis,text.substring(0,100),'',schwere);rb.classList.add('visible');playBeep('success');btn.innerHTML=orig;btn.disabled=false;},600);}
-
-// ── FOTO-ANALYSE mit Claude API (Professional Prompt) ──
-const PHOTO_SYSTEM_PROMPT = `Du bist ein professionelles System zur sicherheitsrelevanten Bildanalyse und Ereigniserkennung.
-
-Aufgabe:
-Analysiere das bereitgestellte Bild und bestimme ausschließlich das Ereignis (Ereignis).
-
-Regeln:
-- Gib ausschließlich die Ereignis-Zeile aus.
-- Ausgabeformat MUSS exakt so sein:
-  Ereignis: <Ergebnis>
-- Keine zusätzlichen Sätze wie Hinweise, Fehler oder Statusmeldungen.
-- Keine Erwähnung, ob ein Bild vorhanden ist oder nicht.
-- Die Beschreibung muss kurz sein (3–6 Wörter).
-- Nur visuell erkennbare Inhalte verwenden.
-- Wenn kein Bild vorhanden ist oder der Inhalt unklar ist → schreibe:
-  Ereignis: Unklarer Vorfall
-
-Beispiele:
-Ereignis: Diebstahl festgestellt
-Ereignis: Vandalismus erkannt
-Ereignis: Sachschaden festgestellt
-Ereignis: Unbefugte Person erkannt
-Ereignis: Polizei vor Ort
-Ereignis: Brand oder Rauch erkannt`;
-
-async function analyzePhotoLocally(b64, resultBoxId, btn) {
-  const orig = btn.innerHTML;
-  btn.innerHTML = '<span class="ai-spinner"></span>Analysiere Foto…';
-  btn.disabled = true;
-  const mediaType = b64.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
-  const imageData = b64.split(',')[1];
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 60,
-        system: PHOTO_SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: mediaType, data: imageData } }] }]
-      })
-    });
-    const data = await response.json();
-    const raw = (data.content?.[0]?.text || 'Ereignis: Unklarer Vorfall').trim();
-    const match = raw.match(/Ereignis:\s*(.+)/i);
-    const ereignisText = match ? match[1].trim() : raw;
-    const knownMatch = EREIGNISSE_GROUPS.find(g => !g.disabled && g.label !== 'Freitext…' && g.label.toLowerCase().includes(ereignisText.toLowerCase().substring(0, 10)));
-    const finalEreignis = knownMatch ? knownMatch.label : ereignisText;
-    const isHoch = DANGER_EVENTS.some(d => finalEreignis.includes(d.substring(0, 10)));
-    const isMittel = EVENT_COLORS.orange.some(o => finalEreignis.includes(o.substring(0, 10)));
-    const schwere = isHoch ? 'hoch' : isMittel ? 'mittel' : 'niedrig';
-    const rb = document.getElementById(resultBoxId);
-    rb.innerHTML = buildResultHTML('📸 Foto-Analyse', finalEreignis, '', '', schwere);
-    rb.classList.add('visible');
-    playBeep('success');
-  } catch(e) {
-    fallbackPhotoAnalysis(b64, resultBoxId);
-  } finally {
-    btn.innerHTML = orig;
-    btn.disabled = false;
-  }
-}
-
-function fallbackPhotoAnalysis(b64, resultBoxId) {
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.min(img.width, 100); canvas.height = Math.min(img.height, 100);
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let brightness = 0, rAvg = 0, gAvg = 0, bAvg = 0, count = pixels.length / 4;
-    for (let i = 0; i < pixels.length; i += 4) { rAvg += pixels[i]; gAvg += pixels[i+1]; bAvg += pixels[i+2]; brightness += (pixels[i]*0.299 + pixels[i+1]*0.587 + pixels[i+2]*0.114); }
-    brightness /= count; rAvg /= count; gAvg /= count; bAvg /= count;
-    let ereignis, schwere;
-    if (brightness < 60) { ereignis = 'Defekte Beleuchtung 💡'; schwere = 'mittel'; }
-    else if (bAvg > rAvg + 30) { ereignis = 'Rohrbruch / Wasseraustritt 💧'; schwere = 'hoch'; }
-    else if (rAvg > gAvg + 40) { ereignis = 'Notruf / Notfall gemeldet 🚨'; schwere = 'hoch'; }
-    else { ereignis = 'Sachschaden festgestellt – Dokumentiert'; schwere = 'mittel'; }
-    const rb = document.getElementById(resultBoxId);
-    rb.innerHTML = buildResultHTML('📸 Foto-Analyse', ereignis, '', '', schwere);
-    rb.classList.add('visible');
-    playBeep('success');
-  };
-  img.src = b64;
-}
 </script>
 </body>
 </html>
